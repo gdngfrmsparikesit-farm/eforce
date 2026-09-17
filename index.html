@@ -40,12 +40,13 @@
         <p id="errorMsg" class="text-red-500 text-sm text-center mt-4 hidden"></p>
     </div>
 
-    <script>
-        // GANTI DENGAN URL DAN ANON KEY DARI SUPABASE ANDA
-        const SUPABASE_URL = 'https://xxxxxx.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
-
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        <script>
+        // Kredensial Supabase (URL sudah dibersihkan dari /rest/v1/)
+        const SUPABASE_URL = 'https://liyjnpjawjkobopwuhnb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpeWpucGphd2prb2JvcHd1aG5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2Mjk5MTMsImV4cCI6MjEwNTIwNTkxM30.xAZRyHQQf2c1jYOIlcUpy_XnwScwSdg6bs8on7_t1Nw';
+        
+        // Gunakan nama variabel supabaseClient untuk menghindari konflik
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -59,7 +60,8 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            // Gunakan supabaseClient
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
             if (error) {
                 errorMsg.textContent = 'Login gagal: ' + error.message;
@@ -67,7 +69,6 @@
                 btn.textContent = 'Masuk';
                 btn.disabled = false;
             } else {
-                // Redirect ke dashboard
                 window.location.href = 'dashboard.html';
             }
         });
