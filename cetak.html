@@ -5,15 +5,8 @@
     <title>Cetak Pengajuan - E-Force</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* ====== KONFIGURASI KERTAS F4 ====== */
-        /* F4 / Folio: 215mm x 330mm */
-        @page {
-            size: 215mm 330mm;
-            margin: 15mm 12mm;
-        }
-        
+        @page { size: 215mm 330mm; margin: 15mm 12mm; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body {
             font-family: 'Times New Roman', Times, serif;
             font-size: 11pt;
@@ -21,8 +14,6 @@
             background: #f3f4f6;
             line-height: 1.4;
         }
-        
-        /* Screen preview wrapper (tidak tercetak) */
         .preview-wrapper {
             max-width: 215mm;
             margin: 20px auto;
@@ -30,8 +21,6 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             padding: 15mm 12mm;
         }
-        
-        /* Tombol kontrol (tidak tercetak) */
         .no-print {
             position: fixed;
             top: 20px;
@@ -53,8 +42,7 @@
         .btn-print:hover { background: #047857; }
         .btn-back { background: #6b7280; color: white; }
         .btn-back:hover { background: #4b5563; }
-        
-        /* ====== KOP SURAT ====== */
+
         .kop-surat {
             display: flex;
             align-items: center;
@@ -80,12 +68,8 @@
         .kop-text h2 { font-size: 13pt; font-weight: bold; }
         .kop-text p { font-size: 9pt; }
         .kop-text .alamat { font-size: 8.5pt; font-style: italic; margin-top: 3px; }
-        
-        /* ====== JUDUL ====== */
-        .judul-doc {
-            text-align: center;
-            margin-bottom: 15px;
-        }
+
+        .judul-doc { text-align: center; margin-bottom: 15px; }
         .judul-doc h3 {
             font-size: 13pt;
             font-weight: bold;
@@ -93,11 +77,8 @@
             margin-bottom: 3px;
         }
         .judul-doc .nomor { font-size: 10pt; }
-        
-        /* ====== SECTION ====== */
-        .section {
-            margin-bottom: 12px;
-        }
+
+        .section { margin-bottom: 12px; }
         .section-title {
             background: #e5e7eb;
             padding: 5px 8px;
@@ -106,48 +87,53 @@
             border-left: 4px solid #059669;
             margin-bottom: 8px;
         }
-        
-        /* ====== TABEL DATA ====== */
-        table.data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 10.5pt;
-        }
+
+        table.data-table { width: 100%; border-collapse: collapse; font-size: 10.5pt; }
         table.data-table td {
             padding: 4px 6px;
             vertical-align: top;
             border: 1px solid #999;
         }
-        table.data-table td.label {
-            width: 35%;
-            background: #f9fafb;
-            font-weight: 600;
-        }
+        table.data-table td.label { width: 35%; background: #f9fafb; font-weight: 600; }
         table.data-table td.value { width: 65%; }
-        
-        /* EBM List */
+
+        /* Tabel daftar (list mode) */
+        table.list-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10pt;
+            margin-top: 10px;
+        }
+        table.list-table th {
+            background: #d1d5db;
+            padding: 6px 5px;
+            border: 1px solid #666;
+            font-weight: bold;
+            text-align: center;
+            font-size: 9.5pt;
+        }
+        table.list-table td {
+            padding: 5px;
+            border: 1px solid #999;
+            vertical-align: top;
+        }
+        table.list-table td.center { text-align: center; }
+
         .ebm-list { margin: 0; padding: 0; list-style: none; }
         .ebm-list li { padding: 2px 0; }
-        
-        /* ====== STATUS BADGE ====== */
+
         .status-badge {
             display: inline-block;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 9pt;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 8pt;
             font-weight: bold;
         }
         .status-disetujui { background: #d1fae5; color: #065f46; border: 1px solid #059669; }
         .status-ditolak { background: #fee2e2; color: #991b1b; border: 1px solid #dc2626; }
         .status-proses { background: #fef3c7; color: #92400e; border: 1px solid #f59e0b; }
-        
-        /* ====== TANDA TANGAN ====== */
-        .ttd-area {
-            margin-top: 25px;
-            display: table;
-            width: 100%;
-            table-layout: fixed;
-        }
+
+        .ttd-area { margin-top: 25px; display: table; width: 100%; table-layout: fixed; }
         .ttd-box {
             display: table-cell;
             width: 33.33%;
@@ -156,18 +142,10 @@
             vertical-align: top;
         }
         .ttd-box .jabatan { font-size: 10.5pt; margin-bottom: 3px; }
-        .ttd-box .space {
-            height: 60px;
-            margin: 5px 0;
-        }
-        .ttd-box .nama {
-            font-weight: bold;
-            text-decoration: underline;
-            font-size: 10.5pt;
-        }
+        .ttd-box .space { height: 60px; margin: 5px 0; }
+        .ttd-box .nama { font-weight: bold; text-decoration: underline; font-size: 10.5pt; }
         .ttd-box .nip { font-size: 9pt; }
-        
-        /* ====== FOOTER ====== */
+
         .footer {
             margin-top: 20px;
             padding-top: 8px;
@@ -176,8 +154,11 @@
             text-align: center;
             color: #555;
         }
-        
-        /* ====== MEDIA PRINT ====== */
+
+        /* Page break antar form */
+        .form-page { page-break-after: always; }
+        .form-page:last-child { page-break-after: auto; }
+
         @media print {
             body { background: white; }
             .no-print { display: none !important; }
@@ -190,21 +171,19 @@
             .section { page-break-inside: avoid; }
             .ttd-area { page-break-inside: avoid; }
         }
-        
-        /* Loading */
+
         .loading { text-align: center; padding: 40px; color: #666; font-family: Arial; }
     </style>
 </head>
 <body>
 
-    <!-- Tombol Kontrol (tidak tercetak) -->
     <div class="no-print">
         <button class="btn-back" onclick="window.close()">✕ Tutup</button>
         <button class="btn-print" onclick="window.print()">🖨️ Cetak / Save PDF</button>
     </div>
 
     <div class="preview-wrapper" id="content">
-        <div class="loading">Memuat data pengajuan...</div>
+        <div class="loading">Memuat data...</div>
     </div>
 
     <script>
@@ -214,18 +193,12 @@
 
         function esc(str) {
             if (str === null || str === undefined) return '-';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
         function formatTanggal(dateStr) {
             if (!dateStr) return '-';
-            return new Date(dateStr).toLocaleDateString('id-ID', {
-                day: '2-digit', month: 'long', year: 'numeric'
-            });
+            return new Date(dateStr).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
         }
 
         function formatRupiah(num) {
@@ -242,61 +215,8 @@
             return { label: status.replace(/_/g, ' ').toUpperCase(), cls: 'status-proses' };
         }
 
-        async function loadAndRender() {
-            const params = new URLSearchParams(window.location.search);
-            const id = params.get('id');
-            if (!id) {
-                document.getElementById('content').innerHTML = '<div class="loading">ID pengajuan tidak valid.</div>';
-                return;
-            }
-
-            // Ambil data pengajuan
-            const { data: p, error } = await supabaseClient
-                .from('pengajuan')
-                .select('*, pengaju:admin_ksm_id (nama_lengkap, ksm, email)')
-                .eq('id', id)
-                .maybeSingle();
-
-            if (error || !p) {
-                document.getElementById('content').innerHTML = '<div class="loading">Gagal memuat data: ' + (error?.message || 'Tidak ditemukan') + '</div>';
-                return;
-            }
-
-            // Ambil riwayat
-            const { data: r } = await supabaseClient
-                .from('riwayat_pengajuan')
-                .select('*, user:user_id (nama_lengkap, role)')
-                .eq('pengajuan_id', id)
-                .order('created_at', { ascending: true });
-
-            renderDokumen(p, r || []);
-        }
-
-        function renderDokumen(p, riwayat) {
-            const statusInfo = getStatusInfo(p.status);
-            const df = p.data_farmasi || {};
-            const ebmList = p.ebm_ppk || [];
-            const tglPengajuan = new Date(p.tanggal_pengajuan);
-            const nomorDok = `E-FORCE/${tglPengajuan.getFullYear()}/${String(tglPengajuan.getMonth()+1).padStart(2,'0')}/${p.id.substring(0, 6).toUpperCase()}`;
-
-            // Ambil ttd dari riwayat
-            const findLog = (role) => riwayat.find(r => r.role === role && r.aksi === 'approve');
-            const logAdmin = riwayat.find(r => r.role === 'admin_ksm');
-            const logKetuaKSM = findLog('ketua_ksm');
-            const logAnggotaPFT = findLog('anggota_pft');
-            const logKetuaPFT = findLog('ketua_pft');
-            const logWadir = findLog('wadir');
-
-            // EBM HTML
-            let ebmHtml = '-';
-            if (ebmList.length > 0) {
-                ebmHtml = '<ul class="ebm-list">' + ebmList.map(e => 
-                    `<li>• <strong>${esc(e.tipe)}:</strong> ${esc(e.nama)}${e.link ? ` — <em>${esc(e.link)}</em>` : ''}</li>`
-                ).join('') + '</ul>';
-            }
-
-            const html = `
-                <!-- KOP SURAT -->
+        function kopSurat() {
+            return `
                 <div class="kop-surat">
                     <div class="kop-logo">LOGO<br>RSUD</div>
                     <div class="kop-text">
@@ -306,185 +226,244 @@
                         <p class="alamat">Telp. (0541) 123456 • Email: info@rsudamp.go.id</p>
                     </div>
                 </div>
+            `;
+        }
 
-                <!-- JUDUL -->
+        // ============ MODE 1: DAFTAR PENGAJUAN ============
+        async function renderDaftar(ids) {
+            const { data, error } = await supabaseClient
+                .from('pengajuan')
+                .select('*, pengaju:admin_ksm_id (nama_lengkap, ksm)')
+                .in('id', ids);
+
+            if (error || !data) {
+                document.getElementById('content').innerHTML = '<div class="loading">Gagal memuat data.</div>';
+                return;
+            }
+
+            // Urutkan sesuai urutan ids yang dikirim
+            const sorted = ids.map(id => data.find(d => d.id === id)).filter(Boolean);
+
+            let rowsHtml = '';
+            sorted.forEach((item, idx) => {
+                const statusInfo = getStatusInfo(item.status);
+                rowsHtml += `
+                    <tr>
+                        <td class="center">${idx + 1}</td>
+                        <td>${formatTanggal(item.tanggal_pengajuan)}</td>
+                        <td><strong>${esc(item.nama_obat)}</strong></td>
+                        <td>${esc(item.pengaju?.ksm || '-')}</td>
+                        <td>${esc(item.pemberi_persetujuan || '-')}</td>
+                        <td class="center"><span class="status-badge ${statusInfo.cls}">${statusInfo.label}</span></td>
+                    </tr>
+                `;
+            });
+
+            const html = `
+                ${kopSurat()}
                 <div class="judul-doc">
-                    <h3>FORMULIR PENGAJUAN PENGADAAN OBAT REGULER</h3>
-                    <div class="nomor">Nomor: ${nomorDok}</div>
+                    <h3>DAFTAR PENGAJUAN PENGADAAN OBAT REGULER</h3>
+                    <div class="nomor">Total: ${sorted.length} pengajuan</div>
                 </div>
 
-                <!-- SECTION 1: ADMIN KSM -->
-                <div class="section">
-                    <div class="section-title">A. DATA PENGAJUAN (Admin KSM)</div>
-                    <table class="data-table">
+                <table class="list-table">
+                    <thead>
                         <tr>
-                            <td class="label">Tanggal Pengajuan</td>
-                            <td class="value">${formatTanggal(p.tanggal_pengajuan)}</td>
+                            <th style="width: 5%;">No</th>
+                            <th style="width: 15%;">Tanggal</th>
+                            <th style="width: 25%;">Nama Obat</th>
+                            <th style="width: 20%;">KSM</th>
+                            <th style="width: 20%;">Pemberi Persetujuan</th>
+                            <th style="width: 15%;">Status</th>
                         </tr>
-                        <tr>
-                            <td class="label">Nama Obat</td>
-                            <td class="value"><strong>${esc(p.nama_obat)}</strong></td>
-                        </tr>
-                        <tr>
-                            <td class="label">EBM & PPK/Konsensus</td>
-                            <td class="value">${ebmHtml}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Alasan Pengajuan</td>
-                            <td class="value">${esc(p.alasan_pengajuan)}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Pemberi Persetujuan</td>
-                            <td class="value">${esc(p.pemberi_persetujuan)}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">KSM Pengaju</td>
-                            <td class="value">${esc(p.pengaju?.ksm || '-')}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Diajukan Oleh</td>
-                            <td class="value">${esc(logAdmin?.user?.nama_lengkap || p.pengaju?.nama_lengkap || '-')}</td>
-                        </tr>
-                    </table>
-                </div>
+                    </thead>
+                    <tbody>${rowsHtml}</tbody>
+                </table>
 
-                <!-- SECTION 2: KETUA KSM -->
-                <div class="section">
-                    <div class="section-title">B. KRITERIA RESTRIKSI (Ketua KSM)</div>
-                    <table class="data-table">
-                        <tr>
-                            <td class="label">Kriteria Restriksi</td>
-                            <td class="value">${esc(p.kriteria_restriksi || 'Belum diisi')}</td>
-                        </tr>
-                        ${logKetuaKSM ? `
-                        <tr>
-                            <td class="label">Tinjau Pengajuan</td>
-                            <td class="value">${esc(logKetuaKSM.catatan)}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Status</td>
-                            <td class="value"><span class="status-badge status-disetujui">DISETUJUI</span> pada ${formatTanggal(logKetuaKSM.created_at)}</td>
-                        </tr>` : ''}
-                    </table>
-                </div>
-
-                <!-- SECTION 3: ANGGOTA PFT -->
-                <div class="section">
-                    <div class="section-title">C. DATA FARMASI (Anggota PFT)</div>
-                    <table class="data-table">
-                        <tr>
-                            <td class="label">Keterangan Obat</td>
-                            <td class="value">${esc(df.keterangan_obat)}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Jenis Obat</td>
-                            <td class="value">${esc(df.jenis_obat)}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Nama Obat</td>
-                            <td class="value">${esc(df.nama_obat || p.nama_obat)}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Harga Obat</td>
-                            <td class="value">${formatRupiah(df.harga_obat)}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Kategori Obat</td>
-                            <td class="value">${esc(df.kategori_obat)}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Termasuk Kronis</td>
-                            <td class="value">${esc(df.is_kronis)}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Informasi Keamanan</td>
-                            <td class="value">${esc(df.info_keamanan)}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Obat Alternatif</td>
-                            <td class="value">${esc(df.obat_alternatif)}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Harga Alternatif</td>
-                            <td class="value">${formatRupiah(df.harga_alternatif)}</td>
-                        </tr>
-                    </table>
-                </div>
-
-                <!-- SECTION 4: KETUA PFT -->
-                ${logKetuaPFT ? `
-                <div class="section">
-                    <div class="section-title">D. REKOMENDASI KETUA PFT</div>
-                    <table class="data-table">
-                        <tr>
-                            <td class="label">Rekomendasi</td>
-                            <td class="value">${esc(logKetuaPFT.catatan)}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Tanggal</td>
-                            <td class="value">${formatTanggal(logKetuaPFT.created_at)}</td>
-                        </tr>
-                    </table>
-                </div>` : ''}
-
-                <!-- SECTION 5: WADIR -->
-                ${logWadir ? `
-                <div class="section">
-                    <div class="section-title">E. KEPUTUSAN AKHIR (Wakil Direktur)</div>
-                    <table class="data-table">
-                        <tr>
-                            <td class="label">Status Akhir</td>
-                            <td class="value"><span class="status-badge ${statusInfo.cls}">${statusInfo.label}</span></td>
-                        </tr>
-                        <tr>
-                            <td class="label">Rekomendasi</td>
-                            <td class="value">${esc(logWadir.catatan)}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Tanggal Keputusan</td>
-                            <td class="value">${formatTanggal(logWadir.created_at)}</td>
-                        </tr>
-                    </table>
-                </div>` : ''}
-
-                <!-- TANDA TANGAN -->
-                <div class="ttd-area">
-                    <div class="ttd-box">
-                        <div class="jabatan">Diajukan oleh,<br><strong>Admin KSM</strong></div>
-                        <div class="space"></div>
-                        <div class="nama">${esc(logAdmin?.user?.nama_lengkap || p.pengaju?.nama_lengkap || '.......................')}</div>
-                        <div class="nip">NIP. ..........................</div>
-                    </div>
-                    <div class="ttd-box">
-                        <div class="jabatan">Direview oleh,<br><strong>Ketua KSM</strong></div>
-                        <div class="space"></div>
-                        <div class="nama">${esc(logKetuaKSM?.user?.nama_lengkap || '.......................')}</div>
-                        <div class="nip">NIP. ..........................</div>
-                    </div>
-                    <div class="ttd-box">
-                        <div class="jabatan">Disetujui oleh,<br><strong>Wakil Direktur</strong></div>
-                        <div class="space"></div>
-                        <div class="nama">${esc(logWadir?.user?.nama_lengkap || '.......................')}</div>
-                        <div class="nip">NIP. ..........................</div>
-                    </div>
-                </div>
-
-                <!-- FOOTER -->
                 <div class="footer">
                     Dokumen ini dicetak dari Sistem E-Force • RSUD Aji Muhammad Parikesit<br>
                     Dicetak pada: ${new Date().toLocaleString('id-ID')}
                 </div>
             `;
-
             document.getElementById('content').innerHTML = html;
-
-            // Auto-trigger print setelah 600ms
-            setTimeout(() => {
-                window.print();
-            }, 600);
+            autoPrint();
         }
 
-        loadAndRender();
+        // ============ MODE 2: FORM PENGAJUAN (multiple) ============
+        async function renderForm(ids) {
+            const { data, error } = await supabaseClient
+                .from('pengajuan')
+                .select('*, pengaju:admin_ksm_id (nama_lengkap, ksm, email)')
+                .in('id', ids);
+
+            if (error || !data) {
+                document.getElementById('content').innerHTML = '<div class="loading">Gagal memuat data.</div>';
+                return;
+            }
+
+            const sorted = ids.map(id => data.find(d => d.id === id)).filter(Boolean);
+            
+            // Fetch riwayat untuk semua ids sekaligus
+            const { data: riwayatAll } = await supabaseClient
+                .from('riwayat_pengajuan')
+                .select('*, user:user_id (nama_lengkap, role)')
+                .in('pengajuan_id', ids)
+                .order('created_at', { ascending: true });
+
+            let allFormsHtml = '';
+            sorted.forEach((p, idx) => {
+                const riwayat = (riwayatAll || []).filter(r => r.pengajuan_id === p.id);
+                allFormsHtml += renderSingleForm(p, riwayat);
+            });
+
+            document.getElementById('content').innerHTML = allFormsHtml;
+            autoPrint();
+        }
+
+        function renderSingleForm(p, riwayat) {
+            const statusInfo = getStatusInfo(p.status);
+            const df = p.data_farmasi || {};
+            const ebmList = p.ebm_ppk || [];
+            const tglPengajuan = new Date(p.tanggal_pengajuan);
+            const nomorDok = `E-FORCE/${tglPengajuan.getFullYear()}/${String(tglPengajuan.getMonth()+1).padStart(2,'0')}/${p.id.substring(0, 6).toUpperCase()}`;
+
+            const findLog = (role) => riwayat.find(r => r.role === role && r.aksi === 'approve');
+            const logAdmin = riwayat.find(r => r.role === 'admin_ksm');
+            const logKetuaKSM = findLog('ketua_ksm');
+            const logKetuaPFT = findLog('ketua_pft');
+            const logWadir = findLog('wadir');
+
+            let ebmHtml = '-';
+            if (ebmList.length > 0) {
+                ebmHtml = '<ul class="ebm-list">' + ebmList.map(e => 
+                    `<li>• <strong>${esc(e.tipe)}:</strong> ${esc(e.nama)}${e.link ? ` — <em>${esc(e.link)}</em>` : ''}</li>`
+                ).join('') + '</ul>';
+            }
+
+            return `
+                <div class="form-page">
+                    ${kopSurat()}
+
+                    <div class="judul-doc">
+                        <h3>FORMULIR PENGAJUAN PENGADAAN OBAT REGULER</h3>
+                        <div class="nomor">Nomor: ${nomorDok}</div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">A. DATA PENGAJUAN (Admin KSM)</div>
+                        <table class="data-table">
+                            <tr><td class="label">Tanggal Pengajuan</td><td class="value">${formatTanggal(p.tanggal_pengajuan)}</td></tr>
+                            <tr><td class="label">Nama Obat</td><td class="value"><strong>${esc(p.nama_obat)}</strong></td></tr>
+                            <tr><td class="label">EBM & PPK/Konsensus</td><td class="value">${ebmHtml}</td></tr>
+                            <tr><td class="label">Alasan Pengajuan</td><td class="value">${esc(p.alasan_pengajuan)}</td></tr>
+                            <tr><td class="label">Pemberi Persetujuan</td><td class="value">${esc(p.pemberi_persetujuan)}</td></tr>
+                            <tr><td class="label">KSM Pengaju</td><td class="value">${esc(p.pengaju?.ksm || '-')}</td></tr>
+                            <tr><td class="label">Diajukan Oleh</td><td class="value">${esc(logAdmin?.user?.nama_lengkap || p.pengaju?.nama_lengkap || '-')}</td></tr>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">B. KRITERIA RESTRIKSI (Ketua KSM)</div>
+                        <table class="data-table">
+                            <tr><td class="label">Kriteria Restriksi</td><td class="value">${esc(p.kriteria_restriksi || 'Belum diisi')}</td></tr>
+                            ${logKetuaKSM ? `
+                            <tr><td class="label">Tinjau Pengajuan</td><td class="value">${esc(logKetuaKSM.catatan)}</td></tr>
+                            <tr><td class="label">Status</td><td class="value"><span class="status-badge status-disetujui">DISETUJUI</span> pada ${formatTanggal(logKetuaKSM.created_at)}</td></tr>` : ''}
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">C. DATA FARMASI (Anggota PFT)</div>
+                        <table class="data-table">
+                            <tr><td class="label">Keterangan Obat</td><td class="value">${esc(df.keterangan_obat)}</td></tr>
+                            <tr><td class="label">Jenis Obat</td><td class="value">${esc(df.jenis_obat)}</td></tr>
+                            <tr><td class="label">Nama Obat</td><td class="value">${esc(df.nama_obat || p.nama_obat)}</td></tr>
+                            <tr><td class="label">Harga Obat</td><td class="value">${formatRupiah(df.harga_obat)}</td></tr>
+                            <tr><td class="label">Kategori Obat</td><td class="value">${esc(df.kategori_obat)}</td></tr>
+                            <tr><td class="label">Termasuk Kronis</td><td class="value">${esc(df.is_kronis)}</td></tr>
+                            <tr><td class="label">Informasi Keamanan</td><td class="value">${esc(df.info_keamanan)}</td></tr>
+                            <tr><td class="label">Obat Alternatif</td><td class="value">${esc(df.obat_alternatif)}</td></tr>
+                            <tr><td class="label">Harga Alternatif</td><td class="value">${formatRupiah(df.harga_alternatif)}</td></tr>
+                        </table>
+                    </div>
+
+                    ${logKetuaPFT ? `
+                    <div class="section">
+                        <div class="section-title">D. REKOMENDASI KETUA PFT</div>
+                        <table class="data-table">
+                            <tr><td class="label">Rekomendasi</td><td class="value">${esc(logKetuaPFT.catatan)}</td></tr>
+                            <tr><td class="label">Tanggal</td><td class="value">${formatTanggal(logKetuaPFT.created_at)}</td></tr>
+                        </table>
+                    </div>` : ''}
+
+                    ${logWadir ? `
+                    <div class="section">
+                        <div class="section-title">E. KEPUTUSAN AKHIR (Wakil Direktur)</div>
+                        <table class="data-table">
+                            <tr><td class="label">Status Akhir</td><td class="value"><span class="status-badge ${statusInfo.cls}">${statusInfo.label}</span></td></tr>
+                            <tr><td class="label">Rekomendasi</td><td class="value">${esc(logWadir.catatan)}</td></tr>
+                            <tr><td class="label">Tanggal Keputusan</td><td class="value">${formatTanggal(logWadir.created_at)}</td></tr>
+                        </table>
+                    </div>` : ''}
+
+                    <div class="ttd-area">
+                        <div class="ttd-box">
+                            <div class="jabatan">Diajukan oleh,<br><strong>Admin KSM</strong></div>
+                            <div class="space"></div>
+                            <div class="nama">${esc(logAdmin?.user?.nama_lengkap || p.pengaju?.nama_lengkap || '.......................')}</div>
+                            <div class="nip">NIP. ..........................</div>
+                        </div>
+                        <div class="ttd-box">
+                            <div class="jabatan">Direview oleh,<br><strong>Ketua KSM</strong></div>
+                            <div class="space"></div>
+                            <div class="nama">${esc(logKetuaKSM?.user?.nama_lengkap || '.......................')}</div>
+                            <div class="nip">NIP. ..........................</div>
+                        </div>
+                        <div class="ttd-box">
+                            <div class="jabatan">Disetujui oleh,<br><strong>Wakil Direktur</strong></div>
+                            <div class="space"></div>
+                            <div class="nama">${esc(logWadir?.user?.nama_lengkap || '.......................')}</div>
+                            <div class="nip">NIP. ..........................</div>
+                        </div>
+                    </div>
+
+                    <div class="footer">
+                        Dokumen ini dicetak dari Sistem E-Force • RSUD Aji Muhammad Parikesit<br>
+                        Dicetak pada: ${new Date().toLocaleString('id-ID')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function autoPrint() {
+            setTimeout(() => { window.print(); }, 600);
+        }
+
+        // ============ MAIN ============
+        async function load() {
+            const params = new URLSearchParams(window.location.search);
+            const mode = params.get('mode') || 'form';
+            const idsParam = params.get('ids');
+
+            if (!idsParam) {
+                document.getElementById('content').innerHTML = '<div class="loading">Tidak ada data yang dipilih.</div>';
+                return;
+            }
+
+            const ids = idsParam.split(',').filter(id => id.trim() !== '');
+            if (ids.length === 0) {
+                document.getElementById('content').innerHTML = '<div class="loading">Tidak ada data yang dipilih.</div>';
+                return;
+            }
+
+            if (mode === 'daftar') {
+                await renderDaftar(ids);
+            } else {
+                await renderForm(ids);
+            }
+        }
+
+        load();
     </script>
 </body>
 </html>
