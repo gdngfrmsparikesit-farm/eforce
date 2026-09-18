@@ -264,6 +264,24 @@
             `;
         }
 
+        // ====== RENDER FORM APPROVER (Ketua PFT / Wadir) ======
+        function renderFormApprover(roleName) {
+            // Cari riwayat dengan role tersebut dan aksi approve
+            const log = riwayat.find(r => 
+                r.role === roleName && r.aksi === 'approve'
+            );
+            
+            if (!log) {
+                return '<div class="text-gray-400 text-sm">Belum ada catatan.</div>';
+            }
+            
+            return `
+                ${fieldRow('Rekomendasi', log.catatan)}
+                ${fieldRow('Disetujui Oleh', log.user?.nama_lengkap || 'Unknown')}
+                ${fieldRow('Tanggal Approve', new Date(log.created_at).toLocaleString('id-ID'))}
+            `;
+        }
+
         // ====== RENDER RIWAYAT APPROVAL ======
         function renderRiwayatLog() {
             if (riwayat.length === 0) return '<div class="text-gray-400 text-sm">Belum ada riwayat.</div>';
@@ -309,10 +327,10 @@
                 html += collapsibleSection('Lihat Form Pengajuan Anggota PFT', renderFormAnggotaPFT());
             }
             if (step >= 5) {
-                html += collapsibleSection('Lihat Form Pengajuan Ketua PFT', '<div class="text-gray-400 text-sm">Lihat riwayat approval di bawah.</div>');
+                html += collapsibleSection('Lihat Form Pengajuan Ketua PFT', renderFormApprover('ketua_pft'));
             }
             if (step >= 6) {
-                html += collapsibleSection('Lihat Form Pengajuan Wadir', '<div class="text-gray-400 text-sm">Lihat riwayat approval di bawah.</div>');
+                html += collapsibleSection('Lihat Form Pengajuan Wadir', renderFormApprover('wadir'));
             }
 
             // Log Riwayat
