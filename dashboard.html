@@ -12,33 +12,15 @@
         .bg-rsud-dark { background-color: #047857; }
         .text-rsud { color: #059669; }
         .border-rsud { border-color: #059669; }
-        
-        /* Loading skeleton animation */
-        @keyframes pulse-slow {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
+        @keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .skeleton { animation: pulse-slow 1.5s ease-in-out infinite; }
-        
-        /* Stat card active state */
-        .stat-card {
-            transition: all 0.2s ease;
-            border: 3px solid transparent;
-        }
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-        }
-        .stat-card.active {
-            border-color: #065f46;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(5,150,105,0.4);
-        }
+        .stat-card { transition: all 0.2s ease; border: 3px solid transparent; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
+        .stat-card.active { border-color: #065f46; transform: translateY(-2px); box-shadow: 0 8px 16px rgba(5,150,105,0.4); }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
 
-    <!-- Header -->
     <header class="bg-white shadow-sm border-b sticky top-0 z-10">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-4">
@@ -53,15 +35,12 @@
 
     <main class="max-w-7xl mx-auto px-4 py-6">
 
-        <!-- Breadcrumb -->
         <nav class="text-sm text-gray-500 mb-3">
             <span class="text-rsud font-medium">🏠 Dashboard</span>
         </nav>
 
-        <!-- Greeting -->
         <h1 id="greeting" class="text-xl font-bold text-gray-800 mb-5">Halo, Memuat data...</h1>
 
-        <!-- ====== STAT CARDS ====== -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <button data-tab="tugas-saya" class="stat-card bg-rsud text-white rounded-xl p-5 text-left active">
                 <div class="flex items-center justify-between mb-2">
@@ -97,7 +76,6 @@
             </button>
         </div>
 
-        <!-- ====== FILTER BOX ====== -->
         <div class="bg-rsud rounded-xl p-6 mb-6 shadow-md">
             <h2 class="text-2xl font-bold text-white mb-4">Daftar Pengajuan Obat</h2>
             
@@ -144,20 +122,22 @@
             </div>
         </div>
 
-        <!-- ====== ACTION BUTTONS ====== -->
         <div class="flex justify-between items-center mb-4">
             <button id="ajukanBtn" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 transition flex items-center gap-2">
                 <span>+</span> Ajukan Obat Baru
             </button>
-            <button id="exportBtn" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 transition flex items-center gap-2">
-                <span>⬇</span> Download Excel
-            </button>
+            <div class="flex gap-2">
+                <button id="printBtn" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 transition flex items-center gap-2">
+                    <span>🖨️</span> Cetak PDF (F4)
+                </button>
+                <button id="exportBtn" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 transition flex items-center gap-2">
+                    <span>⬇</span> Download Excel
+                </button>
+            </div>
         </div>
 
-        <!-- Info Jumlah -->
         <div id="infoJumlah" class="text-sm text-gray-500 mb-2"></div>
 
-        <!-- ====== TABLE ====== -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <table class="w-full text-left border-collapse">
                 <thead>
@@ -170,9 +150,7 @@
                         <th class="p-4 font-semibold">Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody" class="text-gray-700 text-sm divide-y divide-gray-100">
-                    <!-- Akan diisi oleh JS -->
-                </tbody>
+                <tbody id="tableBody" class="text-gray-700 text-sm divide-y divide-gray-100"></tbody>
             </table>
         </div>
     </main>
@@ -185,18 +163,15 @@
         let currentUser = null;
         let allPengajuan = [];
         let filteredPengajuan = [];
-        let activeTab = 'tugas-saya'; // Default tab
+        let activeTab = 'tugas-saya';
 
-        // ====== UTIL: Relative Time ======
         function relativeTime(dateStr) {
             const date = new Date(dateStr);
             const now = new Date();
-            const diffMs = now - date;
-            const diffSec = Math.floor(diffMs / 1000);
+            const diffSec = Math.floor((now - date) / 1000);
             const diffMin = Math.floor(diffSec / 60);
             const diffHour = Math.floor(diffMin / 60);
             const diffDay = Math.floor(diffHour / 24);
-            
             if (diffSec < 60) return 'baru saja';
             if (diffMin < 60) return `${diffMin} menit lalu`;
             if (diffHour < 24) return `${diffHour} jam lalu`;
@@ -204,16 +179,15 @@
             return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
         }
 
-        // ====== UTIL: Status Badge (Warna + Ikon) ======
         function getStatusBadge(status) {
             const map = {
-                'draft':               { label: 'Draft',          icon: '📝', cls: 'bg-gray-100 text-gray-700' },
-                'menunggu_ketua_ksm':  { label: 'Menunggu Ketua KSM', icon: '⏳', cls: 'bg-yellow-100 text-yellow-700' },
-                'menunggu_anggota_pft':{ label: 'Menunggu Anggota PFT', icon: '⏳', cls: 'bg-yellow-100 text-yellow-700' },
-                'menunggu_ketua_pft':  { label: 'Menunggu Ketua PFT', icon: '⏳', cls: 'bg-yellow-100 text-yellow-700' },
-                'menunggu_wadir':      { label: 'Menunggu Wadir', icon: '⏳', cls: 'bg-yellow-100 text-yellow-700' },
-                'disetujui':           { label: 'Disetujui',      icon: '✅', cls: 'bg-green-100 text-green-700' },
-                'ditolak':             { label: 'Ditolak',        icon: '❌', cls: 'bg-red-100 text-red-700' }
+                'draft':                { label: 'Draft', icon: '📝', cls: 'bg-gray-100 text-gray-700' },
+                'menunggu_ketua_ksm':   { label: 'Menunggu Ketua KSM', icon: '⏳', cls: 'bg-yellow-100 text-yellow-700' },
+                'menunggu_anggota_pft': { label: 'Menunggu Anggota PFT', icon: '⏳', cls: 'bg-yellow-100 text-yellow-700' },
+                'menunggu_ketua_pft':   { label: 'Menunggu Ketua PFT', icon: '⏳', cls: 'bg-yellow-100 text-yellow-700' },
+                'menunggu_wadir':       { label: 'Menunggu Wadir', icon: '⏳', cls: 'bg-yellow-100 text-yellow-700' },
+                'disetujui':            { label: 'Disetujui', icon: '✅', cls: 'bg-green-100 text-green-700' },
+                'ditolak':              { label: 'Ditolak', icon: '❌', cls: 'bg-red-100 text-red-700' }
             };
             const item = map[status] || { label: status, icon: '•', cls: 'bg-gray-100 text-gray-700' };
             return `<span class="px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1 ${item.cls}">
@@ -221,138 +195,96 @@
             </span>`;
         }
 
-        // ====== UTIL: Apakah ini tugas user yang login? ======
         function isMyTask(item) {
             if (!currentUser) return false;
             const role = currentUser.role;
             const status = item.status;
-            
-            // Map role → status yang butuh tindakannya
             const taskMap = {
                 'ketua_ksm':   'menunggu_ketua_ksm',
                 'anggota_pft': 'menunggu_anggota_pft',
                 'ketua_pft':   'menunggu_ketua_pft',
                 'wadir':       'menunggu_wadir'
             };
-            
             if (role === 'admin_ksm') {
-                // Admin KSM: pengajuan buatannya yang masih dalam proses (belum final)
-                return item.admin_ksm_id === currentUser.id && 
-                       !['disetujui', 'ditolak'].includes(status);
+                return item.admin_ksm_id === currentUser.id && !['disetujui', 'ditolak'].includes(status);
             }
-            
             return status === taskMap[role];
         }
 
-        // ====== CEK AUTH ======
         async function checkAuth() {
-            console.log("1. Memeriksa sesi login...");
             const { data: { session }, error } = await supabaseClient.auth.getSession();
-            
             if (error || !session) {
-                console.log("2. Sesi tidak ditemukan, redirect ke login.");
                 window.location.href = 'index.html';
                 return;
             }
-            
-            console.log("3. Sesi ditemukan:", session.user.email);
-            
             const { data: profile, error: profileError } = await supabaseClient
                 .from('users')
                 .select('*')
                 .eq('id', session.user.id)
                 .single();
-
-            if (profileError) {
-                console.error("4. Gagal mengambil profil:", profileError.message);
-            }
-
+            if (profileError) console.error("Gagal ambil profil:", profileError.message);
             if (profile) {
                 currentUser = profile;
                 document.getElementById('greeting').textContent = `Halo, ${profile.nama_lengkap} (${profile.role.replace(/_/g, ' ').toUpperCase()})`;
-                
                 if (profile.role !== 'admin_ksm') {
                     document.getElementById('ajukanBtn').style.display = 'none';
                 }
             }
-            
             renderSkeleton();
             fetchPengajuan();
         }
 
-        // ====== SKELETON LOADING ======
         function renderSkeleton() {
             const tbody = document.getElementById('tableBody');
             let rows = '';
             for (let i = 0; i < 3; i++) {
-                rows += `
-                    <tr>
-                        <td class="p-4"><div class="h-4 w-8 bg-gray-200 rounded skeleton"></div></td>
-                        <td class="p-4"><div class="h-4 w-24 bg-gray-200 rounded skeleton"></div></td>
-                        <td class="p-4"><div class="h-4 w-32 bg-gray-200 rounded skeleton"></div></td>
-                        <td class="p-4"><div class="h-4 w-20 bg-gray-200 rounded skeleton"></div></td>
-                        <td class="p-4"><div class="h-6 w-28 bg-gray-200 rounded-full skeleton"></div></td>
-                        <td class="p-4"><div class="h-4 w-12 bg-gray-200 rounded skeleton"></div></td>
-                    </tr>
-                `;
+                rows += `<tr>
+                    <td class="p-4"><div class="h-4 w-8 bg-gray-200 rounded skeleton"></div></td>
+                    <td class="p-4"><div class="h-4 w-24 bg-gray-200 rounded skeleton"></div></td>
+                    <td class="p-4"><div class="h-4 w-32 bg-gray-200 rounded skeleton"></div></td>
+                    <td class="p-4"><div class="h-4 w-20 bg-gray-200 rounded skeleton"></div></td>
+                    <td class="p-4"><div class="h-6 w-28 bg-gray-200 rounded-full skeleton"></div></td>
+                    <td class="p-4"><div class="h-4 w-12 bg-gray-200 rounded skeleton"></div></td>
+                </tr>`;
             }
             tbody.innerHTML = rows;
         }
 
-        // ====== FETCH DATA ======
         async function fetchPengajuan() {
-            console.log("5. Mengambil data...");
             const tbody = document.getElementById('tableBody');
-            
             const { data, error } = await supabaseClient
                 .from('pengajuan')
                 .select(`*, pengaju:admin_ksm_id (nama_lengkap, ksm)`)
                 .order('created_at', { ascending: false });
 
             if (error) {
-                console.error("6. Error:", error.message);
                 tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-400">Gagal memuat data: ${error.message}</td></tr>`;
                 return;
             }
-
-            console.log("7. Data diambil:", data.length);
             allPengajuan = data;
-            
             updateStatCards();
             applyTabFilter();
         }
 
-        // ====== UPDATE STAT CARDS ======
         function updateStatCards() {
             const total = allPengajuan.length;
             const disetujui = allPengajuan.filter(p => p.status === 'disetujui').length;
             const ditolak = allPengajuan.filter(p => p.status === 'ditolak').length;
             const tugasSaya = allPengajuan.filter(isMyTask).length;
-            
             document.getElementById('countTugasSaya').textContent = tugasSaya;
             document.getElementById('countSemua').textContent = total;
             document.getElementById('countDisetujui').textContent = disetujui;
             document.getElementById('countDitolak').textContent = ditolak;
         }
 
-        // ====== APPLY TAB FILTER ======
         function applyTabFilter() {
             let base = [...allPengajuan];
-            
-            if (activeTab === 'tugas-saya') {
-                base = base.filter(isMyTask);
-            } else if (activeTab === 'disetujui') {
-                base = base.filter(p => p.status === 'disetujui');
-            } else if (activeTab === 'ditolak') {
-                base = base.filter(p => p.status === 'ditolak');
-            }
-            // 'semua' → tidak ada filter
-            
-            // Setelah filter tab, jalankan filter form (jika ada)
+            if (activeTab === 'tugas-saya') base = base.filter(isMyTask);
+            else if (activeTab === 'disetujui') base = base.filter(p => p.status === 'disetujui');
+            else if (activeTab === 'ditolak') base = base.filter(p => p.status === 'ditolak');
             applyFormFilter(base);
         }
 
-        // ====== APPLY FORM FILTER (dari input user) ======
         function applyFormFilter(baseData) {
             const namaObat = document.getElementById('searchObat').value.toLowerCase().trim();
             const dari = document.getElementById('dariTanggal').value;
@@ -361,20 +293,15 @@
 
             filteredPengajuan = baseData.filter(item => {
                 if (namaObat && !item.nama_obat.toLowerCase().includes(namaObat)) return false;
-                
                 const tgl = item.tanggal_pengajuan;
                 if (dari && tgl < dari) return false;
                 if (sampai && tgl > sampai) return false;
-                
                 if (ksm && item.pengaju?.ksm !== ksm) return false;
-                
                 return true;
             });
-            
             renderTable();
         }
 
-        // ====== RENDER TABLE ======
         function renderTable() {
             const tbody = document.getElementById('tableBody');
             const infoJumlah = document.getElementById('infoJumlah');
@@ -390,10 +317,7 @@
 
             tbody.innerHTML = filteredPengajuan.map((item, index) => {
                 const highlight = isMyTask(item);
-                const rowClass = highlight 
-                    ? 'bg-yellow-50 border-l-4 border-yellow-400 hover:bg-yellow-100' 
-                    : 'hover:bg-gray-50';
-                
+                const rowClass = highlight ? 'bg-yellow-50 border-l-4 border-yellow-400 hover:bg-yellow-100' : 'hover:bg-gray-50';
                 return `
                     <tr class="${rowClass} transition">
                         <td class="p-4">${index + 1}</td>
@@ -413,25 +337,15 @@
                 `;
             }).join('');
             
-            const tabLabel = {
-                'tugas-saya': 'Tugas Saya',
-                'semua': 'Semua Pengajuan',
-                'disetujui': 'Disetujui',
-                'ditolak': 'Ditolak'
-            }[activeTab];
-            
+            const tabLabel = { 'tugas-saya': 'Tugas Saya', 'semua': 'Semua Pengajuan', 'disetujui': 'Disetujui', 'ditolak': 'Ditolak' }[activeTab];
             infoJumlah.textContent = `Menampilkan ${filteredPengajuan.length} data di "${tabLabel}"`;
         }
 
-        // ====== TAB SWITCHING ======
         function switchTab(tabName) {
             activeTab = tabName;
-            
-            // Update active state kartu
             document.querySelectorAll('.stat-card').forEach(card => {
                 if (card.dataset.tab === tabName) {
                     card.classList.add('active');
-                    // Jika tab "tugas-saya", kasih warna hijau
                     if (tabName === 'tugas-saya') {
                         card.classList.add('bg-rsud', 'text-white');
                         card.classList.remove('bg-white', 'text-gray-700');
@@ -440,28 +354,23 @@
                     card.classList.remove('active');
                 }
             });
-            
             applyTabFilter();
         }
 
-        // ====== RESET FILTER ======
         function resetFilter() {
             document.getElementById('searchObat').value = '';
             document.getElementById('dariTanggal').value = '';
             document.getElementById('sampaiTanggal').value = '';
             document.getElementById('tipePengajuan').value = '';
             document.getElementById('filterKsm').value = '';
-            
             applyTabFilter();
         }
 
-        // ====== EXPORT EXCEL ======
         function exportExcel() {
             if (filteredPengajuan.length === 0) {
                 alert('Tidak ada data untuk diekspor.');
                 return;
             }
-
             const dataExcel = filteredPengajuan.map((item, index) => ({
                 'No': index + 1,
                 'Tanggal Pengajuan': new Date(item.tanggal_pengajuan).toLocaleDateString('id-ID'),
@@ -472,45 +381,39 @@
                 'Status': item.status.replace(/_/g, ' ').toUpperCase(),
                 'Tanggal Dibuat': new Date(item.created_at).toLocaleString('id-ID')
             }));
-
             const ws = XLSX.utils.json_to_sheet(dataExcel);
-            ws['!cols'] = [
-                { wch: 5 }, { wch: 15 }, { wch: 25 }, { wch: 20 },
-                { wch: 25 }, { wch: 40 }, { wch: 20 }, { wch: 20 }
-            ];
-
+            ws['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 25 }, { wch: 20 }, { wch: 25 }, { wch: 40 }, { wch: 20 }, { wch: 20 }];
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Pengajuan Obat');
-
             const today = new Date();
             const fileName = `pengajuan-obat-${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}.xlsx`;
-            
             XLSX.writeFile(wb, fileName);
-            console.log('Export berhasil:', fileName);
         }
 
-        // ====== EVENT LISTENERS ======
+        function printPengajuan() {
+            if (filteredPengajuan.length === 0) {
+                alert('Tidak ada data untuk dicetak.');
+                return;
+            }
+            if (filteredPengajuan.length > 1) {
+                const pilihan = confirm(`Ada ${filteredPengajuan.length} data. Cetak data pertama (${filteredPengajuan[0].nama_obat})?`);
+                if (!pilihan) return;
+            }
+            window.open('cetak.html?id=' + filteredPengajuan[0].id, '_blank');
+        }
+
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             await supabaseClient.auth.signOut();
             window.location.href = 'index.html';
         });
-
-        document.getElementById('ajukanBtn').addEventListener('click', () => {
-            window.location.href = 'pengajuan.html';
-        });
-
+        document.getElementById('ajukanBtn').addEventListener('click', () => { window.location.href = 'pengajuan.html'; });
         document.getElementById('searchBtn').addEventListener('click', () => applyTabFilter());
         document.getElementById('resetFilter').addEventListener('click', resetFilter);
         document.getElementById('exportBtn').addEventListener('click', exportExcel);
-
+        document.getElementById('printBtn').addEventListener('click', printPengajuan);
         document.getElementById('searchObat').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                applyTabFilter();
-            }
+            if (e.key === 'Enter') { e.preventDefault(); applyTabFilter(); }
         });
-
-        // Tab cards
         document.querySelectorAll('.stat-card').forEach(card => {
             card.addEventListener('click', () => switchTab(card.dataset.tab));
         });
