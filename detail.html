@@ -6,6 +6,7 @@
     <title>Detail Pengajuan - E-Force</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         .bg-rsud { background-color: #059669; }
         .text-rsud { color: #059669; }
@@ -14,12 +15,6 @@
         .step-inactive { background-color: white; color: #9ca3af; border-color: #e5e7eb; }
         details > summary { list-style: none; cursor: pointer; }
         details > summary::-webkit-details-marker { display: none; }
-        
-        /* Highlight baris tugas */
-        .task-highlight {
-            background-color: #fef3c7;
-            border-left: 4px solid #f59e0b;
-        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
@@ -36,31 +31,30 @@
 
     <main class="max-w-4xl mx-auto px-4 py-8">
 
-        <!-- Breadcrumb -->
         <nav class="text-sm text-gray-500 mb-3">
             <a href="dashboard.html" class="hover:text-emerald-600">🏠 Dashboard</a>
             <span class="mx-2">›</span>
             <span class="text-rsud font-medium">Detail Pengajuan</span>
         </nav>
 
-        <a href="dashboard.html" class="inline-flex items-center gap-2 px-4 py-2 border border-emerald-300 text-rsud rounded-full text-sm hover:bg-emerald-50 transition mb-6">
-            <span>‹</span> Kembali Ke Halaman Awal
-        </a>
+        <div class="flex justify-between items-center mb-6">
+            <a href="dashboard.html" class="inline-flex items-center gap-2 px-4 py-2 border border-emerald-300 text-rsud rounded-full text-sm hover:bg-emerald-50 transition">
+                <span>‹</span> Kembali Ke Halaman Awal
+            </a>
+            <button id="printDetailBtn" class="inline-flex items-center gap-2 px-4 py-2 bg-rsud text-white rounded-full text-sm hover:bg-emerald-700 transition">
+                🖨️ Cetak PDF
+            </button>
+        </div>
 
-        <!-- Progress Bar -->
         <div id="progressBar" class="flex items-center justify-between mb-8 px-4"></div>
 
-        <!-- Loading State -->
         <div id="loadingState" class="text-center py-12 text-gray-400">Memuat data pengajuan...</div>
-
-        <!-- Error State -->
         <div id="errorState" class="hidden bg-red-50 border border-red-300 rounded-2xl p-6 text-center text-red-700 text-sm"></div>
-
-        <!-- Content -->
         <div id="contentArea" class="hidden space-y-4"></div>
 
     </main>
 
+    <script src="emailHelper.js"></script>
     <script>
         const SUPABASE_URL = 'https://liyjnpjawjkobopwuhnb.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpeWpucGphd2prb2JvcHd1aG5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2Mjk5MTMsImV4cCI6MjEwNTIwNTkxM30.xAZRyHQQf2c1jYOIlcUpy_XnwScwSdg6bs8on7_t1Nw';
@@ -79,16 +73,13 @@
             { key: 5, label: 'Wakil Direktur' }
         ];
 
-        // ====== UTIL: Relative Time ======
         function relativeTime(dateStr) {
             const date = new Date(dateStr);
             const now = new Date();
-            const diffMs = now - date;
-            const diffSec = Math.floor(diffMs / 1000);
+            const diffSec = Math.floor((now - date) / 1000);
             const diffMin = Math.floor(diffSec / 60);
             const diffHour = Math.floor(diffMin / 60);
             const diffDay = Math.floor(diffHour / 24);
-            
             if (diffSec < 60) return 'baru saja';
             if (diffMin < 60) return `${diffMin} menit lalu`;
             if (diffHour < 24) return `${diffHour} jam lalu`;
@@ -104,12 +95,10 @@
             console.error('ERROR DETAIL:', msg);
         }
 
-        // ====== LOAD DATA ======
         async function init() {
             try {
                 const params = new URLSearchParams(window.location.search);
                 pengajuanId = params.get('id');
-
                 if (!pengajuanId) {
                     alert('ID pengajuan tidak ditemukan di URL.');
                     window.location.href = 'dashboard.html';
@@ -122,26 +111,17 @@
                     return;
                 }
 
-                console.log('1. Sesi ditemukan:', session.user.email);
-
-                const { data: profile, error: profileError } = await supabaseClient
+                const { data: profile } = await supabaseClient
                     .from('users')
                     .select('*')
                     .eq('id', session.user.id)
                     .maybeSingle();
 
-                if (profileError) {
-                    console.error('2. Error ambil profil:', profileError.message);
-                }
-
                 if (!profile) {
-                    console.error('2. User tidak ditemukan di tabel public.users.');
                     showError('Akun Anda belum terdaftar di sistem. Hubungi admin untuk mendaftarkan akun Anda di tabel users.');
                     return;
                 }
-
                 currentUser = profile;
-                console.log('2. Profil:', currentUser.nama_lengkap, '- Role:', currentUser.role);
 
                 const { data: pData, error: pError } = await supabaseClient
                     .from('pengajuan')
@@ -150,30 +130,21 @@
                     .maybeSingle();
 
                 if (pError) {
-                    console.error('3. Error:', pError.message);
                     showError('Gagal memuat pengajuan: ' + pError.message);
                     return;
                 }
-
                 if (!pData) {
                     showError('Pengajuan tidak ditemukan.');
                     return;
                 }
-
                 pengajuan = pData;
-                console.log('3. Pengajuan:', pengajuan.nama_obat, '- Step:', pengajuan.current_step);
 
-                const { data: rData, error: rError } = await supabaseClient
+                const { data: rData } = await supabaseClient
                     .from('riwayat_pengajuan')
                     .select('*, user:user_id (nama_lengkap, role)')
                     .eq('pengajuan_id', pengajuanId)
                     .order('created_at', { ascending: true });
-
-                if (rError) {
-                    console.warn('4. Gagal ambil riwayat:', rError.message);
-                }
                 riwayat = rData || [];
-                console.log('4. Riwayat:', riwayat.length, 'baris');
 
                 renderProgressBar();
                 renderContent();
@@ -186,21 +157,15 @@
             }
         }
 
-        // ====== PROGRESS BAR ======
         function renderProgressBar() {
             const currentStep = pengajuan.current_step;
             const container = document.getElementById('progressBar');
-            
             let html = '';
             STEPS.forEach((step, idx) => {
                 let cls = 'step-inactive';
                 let inner = step.key;
-                if (step.key < currentStep) {
-                    cls = 'step-done';
-                    inner = '✓';
-                } else if (step.key === currentStep) {
-                    cls = 'step-active';
-                }
+                if (step.key < currentStep) { cls = 'step-done'; inner = '✓'; }
+                else if (step.key === currentStep) { cls = 'step-active'; }
                 html += `
                     <div class="flex flex-col items-center flex-1">
                         <div class="w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold ${cls}">${inner}</div>
@@ -212,7 +177,6 @@
             container.innerHTML = html;
         }
 
-        // ====== HELPER: Collapsible Section ======
         function collapsibleSection(title, contentHtml, defaultOpen = false) {
             return `
                 <details ${defaultOpen ? 'open' : ''} class="bg-rsud rounded-lg overflow-hidden shadow-sm">
@@ -236,7 +200,6 @@
             `;
         }
 
-        // ====== RENDER FORM STEP 1 (Admin KSM) ======
         function renderFormAdminKSM() {
             let ebmHtml = '';
             const ebmList = pengajuan.ebm_ppk || [];
@@ -251,7 +214,6 @@
             } else {
                 ebmHtml = '<div class="text-gray-400 text-sm">-</div>';
             }
-
             return `
                 ${fieldRow('Tanggal Pengajuan', new Date(pengajuan.tanggal_pengajuan).toLocaleDateString('id-ID'))}
                 ${fieldRow('Nama Obat', pengajuan.nama_obat)}
@@ -264,12 +226,10 @@
             `;
         }
 
-        // ====== RENDER FORM STEP 2 (Ketua KSM) ======
         function renderFormKetuaKSM() {
             return fieldRow('Kriteria Restriksi', pengajuan.kriteria_restriksi);
         }
 
-        // ====== RENDER FORM STEP 3 (Anggota PFT) ======
         function renderFormAnggotaPFT() {
             const df = pengajuan.data_farmasi || {};
             return `
@@ -287,14 +247,9 @@
             `;
         }
 
-        // ====== RENDER FORM APPROVER (Ketua PFT / Wadir) ======
         function renderFormApprover(roleName) {
             const log = riwayat.find(r => r.role === roleName && r.aksi === 'approve');
-            
-            if (!log) {
-                return '<div class="text-gray-400 text-sm">Belum ada catatan.</div>';
-            }
-            
+            if (!log) return '<div class="text-gray-400 text-sm">Belum ada catatan.</div>';
             return `
                 ${fieldRow('Rekomendasi', log.catatan)}
                 ${fieldRow('Disetujui Oleh', log.user?.nama_lengkap || 'Unknown')}
@@ -303,7 +258,6 @@
             `;
         }
 
-        // ====== RENDER RIWAYAT APPROVAL ======
         function renderRiwayatLog() {
             if (riwayat.length === 0) return '<div class="text-gray-400 text-sm">Belum ada riwayat.</div>';
             return riwayat.map(r => {
@@ -311,7 +265,6 @@
                 const aksiLabel = r.aksi ? r.aksi.toUpperCase() : '-';
                 const dotColor = r.aksi === 'approve' ? 'bg-green-500' : r.aksi === 'reject' ? 'bg-red-500' : 'bg-blue-500';
                 const aksiIcon = r.aksi === 'approve' ? '✅' : r.aksi === 'reject' ? '❌' : '📝';
-                
                 return `
                     <div class="flex gap-3 mb-3 pb-3 border-b border-gray-100 last:border-0">
                         <div class="w-2 h-2 rounded-full ${dotColor} mt-2 flex-shrink-0"></div>
@@ -330,40 +283,25 @@
             }).join('');
         }
 
-        // ====== RENDER HALAMAN ======
         function renderContent() {
-            if (!currentUser || !pengajuan) {
-                console.warn('Data belum siap untuk render.');
-                return;
-            }
+            if (!currentUser || !pengajuan) return;
 
             const container = document.getElementById('contentArea');
             const step = pengajuan.current_step;
             const role = currentUser.role;
             let html = '';
 
-            // Section Collapsible
             html += collapsibleSection('Lihat Form Pengajuan Admin KSM', renderFormAdminKSM());
-            if (step >= 3) {
-                html += collapsibleSection('Lihat Form Pengajuan Ketua KSM', renderFormKetuaKSM());
-            }
-            if (step >= 4) {
-                html += collapsibleSection('Lihat Form Pengajuan Anggota PFT', renderFormAnggotaPFT());
-            }
-            if (step >= 5) {
-                html += collapsibleSection('Lihat Form Pengajuan Ketua PFT', renderFormApprover('ketua_pft'));
-            }
-            if (step >= 6) {
-                html += collapsibleSection('Lihat Form Pengajuan Wadir', renderFormApprover('wadir'));
-            }
+            if (step >= 3) html += collapsibleSection('Lihat Form Pengajuan Ketua KSM', renderFormKetuaKSM());
+            if (step >= 4) html += collapsibleSection('Lihat Form Pengajuan Anggota PFT', renderFormAnggotaPFT());
+            if (step >= 5) html += collapsibleSection('Lihat Form Pengajuan Ketua PFT', renderFormApprover('ketua_pft'));
+            if (step >= 6) html += collapsibleSection('Lihat Form Pengajuan Wadir', renderFormApprover('wadir'));
 
-            // Log Riwayat
             html += `<div class="bg-white rounded-2xl border border-emerald-200 shadow-sm p-6">
                 <h3 class="text-lg font-bold text-rsud mb-4">📜 Riwayat Approval</h3>
                 ${renderRiwayatLog()}
             </div>`;
 
-            // Cek giliran user
             const isMyTurn = (
                 (step === 2 && role === 'ketua_ksm') ||
                 (step === 3 && role === 'anggota_pft') ||
@@ -372,7 +310,6 @@
             );
 
             if (isMyTurn) {
-                // Highlight: banner kuning untuk tugas
                 html += `<div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mb-2">
                     <div class="flex items-center gap-2 text-yellow-800 font-medium">
                         <span class="text-xl">⚡</span>
@@ -469,7 +406,6 @@
                     `;
                 }
 
-                // Tombol Aksi
                 if (role === 'anggota_pft') {
                     html += `<button type="submit" id="submitBtn" class="w-full bg-rsud text-white font-semibold py-3 rounded-full hover:bg-emerald-700 transition">Submit</button>`;
                 } else if (role === 'wadir') {
@@ -501,7 +437,6 @@
             }
         }
 
-        // ====== HANDLE APPROVE ======
         async function handleApprove(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
@@ -544,7 +479,6 @@
             });
 
             if (error) {
-                console.error('Error:', error);
                 errorMsg.textContent = 'Gagal: ' + error.message;
                 errorMsg.classList.remove('hidden');
                 btn.textContent = role === 'anggota_pft' ? 'Submit' : '✅ Approve';
@@ -552,11 +486,34 @@
                 return;
             }
 
-            alert('Berhasil!');
+            alert('Berhasil! Email notifikasi sedang dikirim...');
+            
+            // === KIRIM EMAIL KE ROLE BERIKUTNYA ===
+            const nextRoleMap = {
+                'ketua_ksm':   { next: 'anggota_pft',  status: 'Menunggu Persetujuan' },
+                'anggota_pft': { next: 'ketua_pft',    status: 'Menunggu Persetujuan' },
+                'ketua_pft':   { next: 'wadir',        status: 'Menunggu Persetujuan' },
+                'wadir':       { next: 'admin_ksm',    status: 'Dikonfirmasi ✅' }
+            };
+            
+            const nextInfo = nextRoleMap[role];
+            if (nextInfo) {
+                await sendEmailNotif(
+                    nextInfo.next,
+                    {
+                        id: pengajuanId,
+                        nama_obat: pengajuan.nama_obat,
+                        pengaju: pengajuan.pengaju
+                    },
+                    nextInfo.status,
+                    catatan,
+                    supabaseClient
+                );
+            }
+            
             window.location.reload();
         }
 
-        // ====== HANDLE REJECT ======
         async function handleReject() {
             const catatan = prompt('Masukkan alasan penolakan:');
             if (!catatan) return;
@@ -571,14 +528,41 @@
                 return;
             }
 
-            alert('Pengajuan ditolak dan dikembalikan ke step sebelumnya.');
+            alert('Pengajuan ditolak. Email notifikasi sedang dikirim...');
+            
+            // === KIRIM EMAIL REJECT KE ROLE SEBELUMNYA ===
+            const stepBefore = {
+                2: 'admin_ksm',
+                3: 'ketua_ksm',
+                4: 'anggota_pft',
+                5: 'ketua_pft'
+            };
+            const targetRole = stepBefore[pengajuan.current_step];
+            
+            if (targetRole) {
+                await sendEmailNotif(
+                    targetRole,
+                    {
+                        id: pengajuanId,
+                        nama_obat: pengajuan.nama_obat,
+                        pengaju: pengajuan.pengaju
+                    },
+                    'Tidak Dikonfirmasi ❌',
+                    catatan,
+                    supabaseClient
+                );
+            }
+            
             window.location.reload();
         }
 
-        // ====== LOGOUT ======
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             await supabaseClient.auth.signOut();
             window.location.href = 'index.html';
+        });
+
+        document.getElementById('printDetailBtn').addEventListener('click', () => {
+            window.open('cetak.html?id=' + pengajuanId, '_blank');
         });
 
         init();
