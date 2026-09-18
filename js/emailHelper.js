@@ -5,7 +5,7 @@
 
 // ⚠️ GANTI 3 VARIABEL INI DENGAN MILIK ANDA (dari dashboard EmailJS)
 const EMAILJS_PUBLIC_KEY = 'AYo9frQiraJTIa3et';
-const EMAILJS_SERVICE_ID = 'template_whfs6le';
+const EMAILJS_SERVICE_ID = 'service_sxrpjgp';
 const EMAILJS_TEMPLATE_ID = 'template_whfs6le';
 
 function initEmailJS() {
