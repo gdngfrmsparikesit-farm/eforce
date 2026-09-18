@@ -486,29 +486,37 @@
                 return;
             }
 
-            alert('Berhasil! Email notifikasi sedang dikirim...');
+            alert('Berhasil!');
             
-            // === KIRIM EMAIL KE ROLE BERIKUTNYA ===
-            const nextRoleMap = {
-                'ketua_ksm':   { next: 'anggota_pft',  status: 'Menunggu Persetujuan' },
-                'anggota_pft': { next: 'ketua_pft',    status: 'Menunggu Persetujuan' },
-                'ketua_pft':   { next: 'wadir',        status: 'Menunggu Persetujuan' },
-                'wadir':       { next: 'admin_ksm',    status: 'Dikonfirmasi ✅' }
-            };
-            
-            const nextInfo = nextRoleMap[role];
-            if (nextInfo) {
-                await sendEmailNotif(
-                    nextInfo.next,
-                    {
-                        id: pengajuanId,
-                        nama_obat: pengajuan.nama_obat,
-                        pengaju: pengajuan.pengaju
-                    },
-                    nextInfo.status,
-                    catatan,
-                    supabaseClient
-                );
+            // === KIRIM EMAIL KE ROLE BERIKUTNYA (opsional) ===
+            try {
+                if (typeof sendEmailNotif === 'function') {
+                    const nextRoleMap = {
+                        'ketua_ksm':   { next: 'anggota_pft',  status: 'Menunggu Persetujuan' },
+                        'anggota_pft': { next: 'ketua_pft',    status: 'Menunggu Persetujuan' },
+                        'ketua_pft':   { next: 'wadir',        status: 'Menunggu Persetujuan' },
+                        'wadir':       { next: 'admin_ksm',    status: 'Dikonfirmasi ✅' }
+                    };
+                    
+                    const nextInfo = nextRoleMap[role];
+                    if (nextInfo) {
+                        await sendEmailNotif(
+                            nextInfo.next,
+                            {
+                                id: pengajuanId,
+                                nama_obat: pengajuan.nama_obat,
+                                pengaju: pengajuan.pengaju
+                            },
+                            nextInfo.status,
+                            catatan,
+                            supabaseClient
+                        );
+                    }
+                } else {
+                    console.warn('emailHelper.js tidak ditemukan. Email dilewati.');
+                }
+            } catch (emailErr) {
+                console.error('Email gagal, tapi approval tetap berhasil:', emailErr);
             }
             
             window.location.reload();
@@ -528,29 +536,37 @@
                 return;
             }
 
-            alert('Pengajuan ditolak. Email notifikasi sedang dikirim...');
+            alert('Pengajuan ditolak.');
             
-            // === KIRIM EMAIL REJECT KE ROLE SEBELUMNYA ===
-            const stepBefore = {
-                2: 'admin_ksm',
-                3: 'ketua_ksm',
-                4: 'anggota_pft',
-                5: 'ketua_pft'
-            };
-            const targetRole = stepBefore[pengajuan.current_step];
-            
-            if (targetRole) {
-                await sendEmailNotif(
-                    targetRole,
-                    {
-                        id: pengajuanId,
-                        nama_obat: pengajuan.nama_obat,
-                        pengaju: pengajuan.pengaju
-                    },
-                    'Tidak Dikonfirmasi ❌',
-                    catatan,
-                    supabaseClient
-                );
+            // === KIRIM EMAIL REJECT (opsional) ===
+            try {
+                if (typeof sendEmailNotif === 'function') {
+                    const stepBefore = {
+                        2: 'admin_ksm',
+                        3: 'ketua_ksm',
+                        4: 'anggota_pft',
+                        5: 'ketua_pft'
+                    };
+                    const targetRole = stepBefore[pengajuan.current_step];
+                    
+                    if (targetRole) {
+                        await sendEmailNotif(
+                            targetRole,
+                            {
+                                id: pengajuanId,
+                                nama_obat: pengajuan.nama_obat,
+                                pengaju: pengajuan.pengaju
+                            },
+                            'Tidak Dikonfirmasi ❌',
+                            catatan,
+                            supabaseClient
+                        );
+                    }
+                } else {
+                    console.warn('emailHelper.js tidak ditemukan. Email dilewati.');
+                }
+            } catch (emailErr) {
+                console.error('Email gagal, tapi reject tetap berhasil:', emailErr);
             }
             
             window.location.reload();
