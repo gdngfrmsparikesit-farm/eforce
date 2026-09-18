@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - E-Force RSUD Aji Muhammad Parikesit</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .bg-rsud { background-color: #d97746; }
-        .text-rsud { color: #d97746; }
+        .bg-rsud { background-color: #059669; }
+        .text-rsud { color: #059669; }
     </style>
 </head>
 <body class="bg-gray-100 h-screen flex items-center justify-center font-sans">
@@ -18,7 +16,9 @@
     <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
         <!-- Logo RSUD -->
         <div class="flex justify-center mb-6">
-            <img src="https://via.placeholder.com/150x50?text=RSUD+AMP" alt="Logo RSUD" class="h-12">
+            <div class="h-16 w-16 bg-emerald-100 rounded-full flex items-center justify-center">
+                <span class="text-3xl">💊</span>
+            </div>
         </div>
         
         <h1 class="text-2xl font-bold text-center text-gray-800 mb-2">E-Force</h1>
@@ -27,25 +27,23 @@
         <form id="loginForm" class="space-y-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input type="email" id="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition" placeholder="admin@rsud.com">
+                <input type="email" id="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" placeholder="admin@rsud.com">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input type="password" id="password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition" placeholder="••••••••">
+                <input type="password" id="password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" placeholder="••••••••">
             </div>
-            <button type="submit" id="loginBtn" class="w-full bg-rsud text-white font-semibold py-2.5 rounded-lg hover:bg-orange-700 transition duration-200">
+            <button type="submit" id="loginBtn" class="w-full bg-rsud text-white font-semibold py-2.5 rounded-lg hover:bg-emerald-700 transition duration-200">
                 Masuk
             </button>
         </form>
         <p id="errorMsg" class="text-red-500 text-sm text-center mt-4 hidden"></p>
     </div>
 
-        <script>
-        // Kredensial Supabase (URL sudah dibersihkan dari /rest/v1/)
+    <script>
         const SUPABASE_URL = 'https://liyjnpjawjkobopwuhnb.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpeWpucGphd2prb2JvcHd1aG5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2Mjk5MTMsImV4cCI6MjEwNTIwNTkxM30.xAZRyHQQf2c1jYOIlcUpy_XnwScwSdg6bs8on7_t1Nw';
         
-        // Gunakan nama variabel supabaseClient untuk menghindari konflik
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -60,7 +58,6 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            // Gunakan supabaseClient
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
             if (error) {
