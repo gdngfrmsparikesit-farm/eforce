@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cara Penggunaan - E-Force</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-rsud { background-color: #059669; }
+        .text-rsud { color: #059669; }
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] .chevron { transform: rotate(180deg); }
+        .chevron { transition: transform 0.2s ease; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="h-10 w-32 bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs font-semibold">RSUD AMP</div>
+            <div class="flex items-center gap-3">
+                <button class="bg-rsud text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-emerald-700 transition">Cara Penggunaan</button>
+                <button onclick="goBack()" class="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-600 transition">Kembali</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-8">
+
+        <!-- Breadcrumb -->
+        <nav class="text-sm text-gray-500 mb-3">
+            <a href="dashboard.html" class="hover:text-emerald-600">🏠 Dashboard</a>
+            <span class="mx-2">›</span>
+            <span class="text-rsud font-medium">Cara Penggunaan</span>
+        </nav>
+
+        <!-- Hero Section -->
+        <div class="bg-rsud rounded-2xl p-8 mb-8 text-white shadow-md">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="h-16 w-16 bg-white/20 rounded-full flex items-center justify-center">
+                    <span class="text-4xl">📖</span>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold">Cara Penggunaan E-Force</h1>
+                    <p class="text-emerald-100 text-sm mt-1">Panduan lengkap Sistem Pengajuan Pengadaan Obat Reguler</p>
+                </div>
+            </div>
+            <p class="text-emerald-50 text-sm leading-relaxed">
+                E-Force adalah sistem digital untuk mengajukan pengadaan obat secara terstruktur melalui 5 tahap persetujuan. 
+                Setiap role memiliki tugas spesifik dalam alur ini. Pilih role Anda di bawah untuk mempelajari langkah-langkahnya.
+            </p>
+        </div>
+
+        <!-- Alur Singkat -->
+        <div class="bg-white rounded-2xl border border-emerald-200 shadow-sm p-6 mb-8">
+            <h2 class="text-lg font-bold text-rsud mb-5 flex items-center gap-2">
+                <span>🔄</span> Alur Pengajuan (5 Tahap)
+            </h2>
+            
+            <div class="flex flex-col md:flex-row items-stretch justify-between gap-3">
+                <div class="flex-1 bg-emerald-50 rounded-lg p-4 text-center">
+                    <div class="w-10 h-10 rounded-full bg-rsud text-white flex items-center justify-center font-bold mx-auto mb-2">1</div>
+                    <div class="font-semibold text-gray-800 text-sm">Admin KSM</div>
+                    <div class="text-xs text-gray-500 mt-1">Buat pengajuan</div>
+                </div>
+                <div class="flex items-center justify-center text-2xl text-gray-300 md:rotate-0 rotate-90">→</div>
+                <div class="flex-1 bg-emerald-50 rounded-lg p-4 text-center">
+                    <div class="w-10 h-10 rounded-full bg-rsud text-white flex items-center justify-center font-bold mx-auto mb-2">2</div>
+                    <div class="font-semibold text-gray-800 text-sm">Ketua KSM</div>
+                    <div class="text-xs text-gray-500 mt-1">Kriteria & approve</div>
+                </div>
+                <div class="flex items-center justify-center text-2xl text-gray-300 md:rotate-0 rotate-90">→</div>
+                <div class="flex-1 bg-emerald-50 rounded-lg p-4 text-center">
+                    <div class="w-10 h-10 rounded-full bg-rsud text-white flex items-center justify-center font-bold mx-auto mb-2">3</div>
+                    <div class="font-semibold text-gray-800 text-sm">Anggota PFT</div>
+                    <div class="text-xs text-gray-500 mt-1">Data farmasi</div>
+                </div>
+                <div class="flex items-center justify-center text-2xl text-gray-300 md:rotate-0 rotate-90">→</div>
+                <div class="flex-1 bg-emerald-50 rounded-lg p-4 text-center">
+                    <div class="w-10 h-10 rounded-full bg-rsud text-white flex items-center justify-center font-bold mx-auto mb-2">4</div>
+                    <div class="font-semibold text-gray-800 text-sm">Ketua PFT</div>
+                    <div class="text-xs text-gray-500 mt-1">Rekomendasi</div>
+                </div>
+                <div class="flex items-center justify-center text-2xl text-gray-300 md:rotate-0 rotate-90">→</div>
+                <div class="flex-1 bg-emerald-50 rounded-lg p-4 text-center">
+                    <div class="w-10 h-10 rounded-full bg-rsud text-white flex items-center justify-center font-bold mx-auto mb-2">5</div>
+                    <div class="font-semibold text-gray-800 text-sm">Wadir</div>
+                    <div class="text-xs text-gray-500 mt-1">Approval final</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panduan Per Role -->
+        <h2 class="text-lg font-bold text-rsud mb-4 flex items-center gap-2">
+            <span>👥</span> Panduan Per Role
+        </h2>
+
+        <div class="space-y-3">
+
+            <!-- Role 1: Admin KSM -->
+            <details class="bg-white rounded-xl border border-emerald-200 shadow-sm overflow-hidden">
+                <summary class="bg-rsud text-white px-5 py-4 flex justify-between items-center font-medium">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">📝</span>
+                        <div>
+                            <div class="font-semibold">1. Admin KSM</div>
+                            <div class="text-xs text-emerald-100">Membuat pengajuan obat baru</div>
+                        </div>
+                    </div>
+                    <span class="chevron text-xl">⌄</span>
+                </summary>
+                <div class="bg-white p-6 border-t border-emerald-100">
+                    <ol class="space-y-3 text-sm text-gray-700 list-decimal list-inside">
+                        <li>Login dengan akun Admin KSM Anda.</li>
+                        <li>Di halaman <strong>Dashboard</strong>, klik tombol <strong>"+ Ajukan Obat Baru"</strong>.</li>
+                        <li>Isi form pengajuan:
+                            <ul class="list-disc list-inside ml-5 mt-2 text-gray-600 space-y-1">
+                                <li><strong>Tanggal Pengajuan</strong> — tanggal pembuatan pengajuan.</li>
+                                <li><strong>Nama Obat</strong> — nama obat yang diajukan.</li>
+                                <li><strong>EBM & PPK/Konsensus</strong> — bisa tambah beberapa baris (tipe, nama, link).</li>
+                                <li><strong>Alasan Pengajuan</strong> — alasan medis/kebutuhan.</li>
+                                <li><strong>Pemberi Persetujuan</strong> — pilih Ketua KSM tujuan.</li>
+                            </ul>
+                        </li>
+                        <li>Klik tombol <strong>Submit</strong>. Pengajuan akan masuk ke tahap 2 (Ketua KSM).</li>
+                    </ol>
+                    <div class="bg-emerald-50 rounded-lg p-3 mt-4 text-sm text-emerald-800">
+                        <strong>💡 Tips:</strong> Anda bisa pantau status pengajuan yang Anda buat di tab <strong>"Tugas Saya"</strong> — pengajuan yang masih dalam proses akan tampil di sini.
+                    </div>
+                </div>
+            </details>
+
+            <!-- Role 2: Ketua KSM -->
+            <details class="bg-white rounded-xl border border-emerald-200 shadow-sm overflow-hidden">
+                <summary class="bg-rsud text-white px-5 py-4 flex justify-between items-center font-medium">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">🩺</span>
+                        <div>
+                            <div class="font-semibold">2. Ketua KSM</div>
+                            <div class="text-xs text-emerald-100">Meninjau & menetapkan kriteria restriksi</div>
+                        </div>
+                    </div>
+                    <span class="chevron text-xl">⌄</span>
+                </summary>
+                <div class="bg-white p-6 border-t border-emerald-100">
+                    <ol class="space-y-3 text-sm text-gray-700 list-decimal list-inside">
+                        <li>Login dengan akun Ketua KSM Anda.</li>
+                        <li>Di dashboard, kartu <strong>"Tugas Saya"</strong> akan menyala hijau dengan jumlah tugas.</li>
+                        <li>Klik baris pengajuan yang ditandai <strong>kuning</strong> (butuh tindakan Anda), lalu klik tombol <strong>"👉 Proses"</strong>.</li>
+                        <li>Di halaman detail, Anda akan melihat:
+                            <ul class="list-disc list-inside ml-5 mt-2 text-gray-600 space-y-1">
+                                <li>Form pengajuan dari Admin KSM.</li>
+                                <li>Banner kuning <em>"Ini giliran Anda"</em>.</li>
+                                <li>Form untuk mengisi <strong>Kriteria Restriksi</strong> dan <strong>Tinjau Pengajuan</strong>.</li>
+                            </ul>
+                        </li>
+                        <li>Isi Kriteria Restriksi (misalnya: "Hanya untuk pasien BPJS dengan diagnosis kronis").</li>
+                        <li>Isi Tinjau Pengajuan dengan catatan Anda.</li>
+                        <li>Klik <strong>Approve</strong> untuk meneruskan ke Anggota PFT, atau <strong>Reject</strong> untuk mengembalikan ke Admin KSM.</li>
+                    </ol>
+                </div>
+            </details>
+
+            <!-- Role 3: Anggota PFT -->
+            <details class="bg-white rounded-xl border border-emerald-200 shadow-sm overflow-hidden">
+                <summary class="bg-rsud text-white px-5 py-4 flex justify-between items-center font-medium">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">💊</span>
+                        <div>
+                            <div class="font-semibold">3. Anggota PFT</div>
+                            <div class="text-xs text-emerald-100">Melengkapi data farmasi & harga</div>
+                        </div>
+                    </div>
+                    <span class="chevron text-xl">⌄</span>
+                </summary>
+                <div class="bg-white p-6 border-t border-emerald-100">
+                    <ol class="space-y-3 text-sm text-gray-700 list-decimal list-inside">
+                        <li>Login dengan akun Anggota PFT Anda.</li>
+                        <li>Buka tugas Anda dari tab <strong>"Tugas Saya"</strong>.</li>
+                        <li>Isi form data farmasi:
+                            <ul class="list-disc list-inside ml-5 mt-2 text-gray-600 space-y-1">
+                                <li><strong>Keterangan Obat</strong> — Obat Baru / Obat Lama / Pengganti.</li>
+                                <li><strong>Jenis Obat</strong> — Tablet / Kapsul / Sirup / Injeksi / Salep.</li>
+                                <li><strong>Nama Obat</strong> — otomatis terisi.</li>
+                                <li><strong>Harga Obat</strong> — harga satuan dalam Rupiah.</li>
+                                <li><strong>Kategori Obat</strong> — Generik / Paten / Generik Bermerek.</li>
+                                <li><strong>Termasuk Kronis</strong> — Ya / Tidak.</li>
+                                <li><strong>Informasi Keamanan</strong> — ada/tidak informasi keamanan khusus.</li>
+                                <li><strong>Obat Alternatif</strong> — nama obat pengganti (opsional).</li>
+                                <li><strong>Harga Alternatif</strong> — harga obat pengganti (opsional).</li>
+                            </ul>
+                        </li>
+                        <li>Klik <strong>Submit</strong>. Pengajuan akan diteruskan ke Ketua PFT.</li>
+                    </ol>
+                </div>
+            </details>
+
+            <!-- Role 4: Ketua PFT -->
+            <details class="bg-white rounded-xl border border-emerald-200 shadow-sm overflow-hidden">
+                <summary class="bg-rsud text-white px-5 py-4 flex justify-between items-center font-medium">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">⚗️</span>
+                        <div>
+                            <div class="font-semibold">4. Ketua PFT</div>
+                            <div class="text-xs text-emerald-100">Meninjau data farmasi & memberi rekomendasi</div>
+                        </div>
+                    </div>
+                    <span class="chevron text-xl">⌄</span>
+                </summary>
+                <div class="bg-white p-6 border-t border-emerald-100">
+                    <ol class="space-y-3 text-sm text-gray-700 list-decimal list-inside">
+                        <li>Login dengan akun Ketua PFT Anda.</li>
+                        <li>Buka tugas Anda dari tab <strong>"Tugas Saya"</strong>.</li>
+                        <li>Tinjau seluruh data yang sudah diisi oleh 3 role sebelumnya dengan membuka <strong>collapsible section</strong> (klik untuk membuka).</li>
+                        <li>Isi kolom <strong>Rekomendasi</strong> dengan catatan/keputusan Anda (misalnya: "ACC, harga wajar").</li>
+                        <li>Klik <strong>Approve</strong> untuk diteruskan ke Wadir, atau <strong>Reject</strong> jika perlu revisi dari Anggota PFT.</li>
+                    </ol>
+                </div>
+            </details>
+
+            <!-- Role 5: Wadir -->
+            <details class="bg-white rounded-xl border border-emerald-200 shadow-sm overflow-hidden">
+                <summary class="bg-rsud text-white px-5 py-4 flex justify-between items-center font-medium">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">🏛️</span>
+                        <div>
+                            <div class="font-semibold">5. Wakil Direktur (Wadir)</div>
+                            <div class="text-xs text-emerald-100">Approval final pengajuan</div>
+                        </div>
+                    </div>
+                    <span class="chevron text-xl">⌄</span>
+                </summary>
+                <div class="bg-white p-6 border-t border-emerald-100">
+                    <ol class="space-y-3 text-sm text-gray-700 list-decimal list-inside">
+                        <li>Login dengan akun Wadir Anda.</li>
+                        <li>Buka tugas Anda dari tab <strong>"Tugas Saya"</strong>.</li>
+                        <li>Tinjau semua data dan rekomendasi dari 4 role sebelumnya.</li>
+                        <li>Isi kolom <strong>Rekomendasi</strong> sebagai keputusan akhir.</li>
+                        <li>Klik <strong>✅ Approve Final</strong>. Status pengajuan akan menjadi <strong>DISETUJUI</strong> dan proses selesai.</li>
+                    </ol>
+                    <div class="bg-green-50 rounded-lg p-3 mt-4 text-sm text-green-800">
+                        <strong>✅ Catatan:</strong> Wadir tidak memiliki tombol Reject. Jika perlu ditolak, lakukan di tahap sebelumnya (Ketua PFT).
+                    </div>
+                </div>
+            </details>
+
+        </div>
+
+        <!-- Fitur Dashboard -->
+        <h2 class="text-lg font-bold text-rsud mb-4 mt-8 flex items-center gap-2">
+            <span>🎯</span> Fitur Dashboard
+        </h2>
+
+        <div class="bg-white rounded-2xl border border-emerald-200 shadow-sm p-6 space-y-4">
+            <div class="flex gap-3">
+                <span class="text-2xl flex-shrink-0">📌</span>
+                <div>
+                    <div class="font-semibold text-gray-800 mb-1">Kartu "Tugas Saya"</div>
+                    <p class="text-sm text-gray-600">Menampilkan pengajuan yang <strong>membutuhkan tindakan Anda</strong> sebagai approver. Baris ini di-highlight kuning di tabel.</p>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <span class="text-2xl flex-shrink-0">📋</span>
+                <div>
+                    <div class="font-semibold text-gray-800 mb-1">Kartu "Semua"</div>
+                    <p class="text-sm text-gray-600">Menampilkan seluruh pengajuan tanpa filter role. Berguna untuk monitoring keseluruhan.</p>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <span class="text-2xl flex-shrink-0">🔍</span>
+                <div>
+                    <div class="font-semibold text-gray-800 mb-1">Filter & Pencarian</div>
+                    <p class="text-sm text-gray-600">Cari berdasarkan <strong>Nama Obat</strong>, filter berdasarkan <strong>rentang tanggal</strong>, <strong>tipe pengajuan</strong>, atau <strong>Ketua KSM</strong>. Klik "Reset Filter" untuk menghapus semua filter.</p>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <span class="text-2xl flex-shrink-0">⬇</span>
+                <div>
+                    <div class="font-semibold text-gray-800 mb-1">Download Excel</div>
+                    <p class="text-sm text-gray-600">Mengunduh hasil filter ke file Excel (<code class="bg-gray-100 px-1 rounded text-xs">pengajuan-obat-YYYYMMDD.xlsx</code>) untuk keperluan laporan.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <h2 class="text-lg font-bold text-rsud mb-4 mt-8 flex items-center gap-2">
+            <span>❓</span> Pertanyaan Umum (FAQ)
+        </h2>
+
+        <div class="space-y-3">
+            <details class="bg-white rounded-xl border border-emerald-200 shadow-sm overflow-hidden">
+                <summary class="px-5 py-3 flex justify-between items-center font-medium text-gray-800">
+                    <span>Bagaimana jika pengajuan saya di-reject?</span>
+                    <span class="chevron text-xl">⌄</span>
+                </summary>
+                <div class="px-5 pb-4 pt-2 text-sm text-gray-600 border-t border-emerald-100">
+                    Pengajuan akan kembali ke tahap sebelumnya dengan catatan alasan penolakan. Anda bisa merevisi dan submit ulang. Contoh: jika di-reject oleh Wadir, akan kembali ke Ketua PFT. Jika di-reject Ketua KSM, akan kembali ke Admin KSM.
+                </div>
+            </details>
+            <details class="bg-white rounded-xl border border-emerald-200 shadow-sm overflow-hidden">
+                <summary class="px-5 py-3 flex justify-between items-center font-medium text-gray-800">
+                    <span>Kenapa pengajuan tidak muncul di "Tugas Saya"?</span>
+                    <span class="chevron text-xl">⌄</span>
+                </summary>
+                <div class="px-5 pb-4 pt-2 text-sm text-gray-600 border-t border-emerald-100">
+                    Cek status pengajuan di tab "Semua". Jika status belum sesuai dengan role Anda (misalnya Anda Ketua KSM tapi status masih "menunggu_admin" atau sudah lewat ke "menunggu_anggota_pft"), maka pengajuan tidak muncul di Tugas Saya Anda. Tugas Saya hanya menampilkan pengajuan yang <strong>saat ini</strong> menunggu tindakan Anda.
+                </div>
+            </details>
+            <details class="bg-white rounded-xl border border-emerald-200 shadow-sm overflow-hidden">
+                <summary class="px-5 py-3 flex justify-between items-center font-medium text-gray-800">
+                    <span>Apakah bisa mengubah data setelah di-submit?</span>
+                    <span class="chevron text-xl">⌄</span>
+                </summary>
+                <div class="px-5 pb-4 pt-2 text-sm text-gray-600 border-t border-emerald-100">
+                    Tidak bisa langsung. Data yang sudah ter-submit akan terkunci. Jika ada kesalahan, approver di tahap berikutnya harus melakukan <strong>Reject</strong>, sehingga pengajuan kembali ke tahap sebelumnya untuk diperbaiki.
+                </div>
+            </details>
+            <details class="bg-white rounded-xl border border-emerald-200 shadow-sm overflow-hidden">
+                <summary class="px-5 py-3 flex justify-between items-center font-medium text-gray-800">
+                    <span>Siapa yang bisa melihat semua pengajuan?</span>
+                    <span class="chevron text-xl">⌄</span>
+                </summary>
+                <div class="px-5 pb-4 pt-2 text-sm text-gray-600 border-t border-emerald-100">
+                    Semua role yang login bisa melihat <strong>semua pengajuan</strong> di tab "Semua". Namun, hanya role yang sesuai dengan tahap saat ini yang bisa memproses (approve/reject).
+                </div>
+            </details>
+        </div>
+
+        <!-- Footer Info -->
+        <div class="mt-8 text-center text-xs text-gray-400 py-4">
+            E-Force • RSUD Aji Muhammad Parikesit • Versi 1.0
+        </div>
+
+    </main>
+
+    <script>
+        // Fungsi tombol kembali - pintar
+        function goBack() {
+            // Jika ada history, kembali ke halaman sebelumnya
+            if (document.referrer && document.referrer.includes(window.location.host)) {
+                window.history.back();
+            } else {
+                // Fallback ke dashboard
+                window.location.href = 'dashboard.html';
+            }
+        }
+    </script>
+</body>
+</html>
