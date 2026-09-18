@@ -209,20 +209,28 @@
                 return;
             }
 
-            alert('Pengajuan berhasil dikirim! Email notifikasi sedang dikirim ke Ketua KSM...');
+            alert('Pengajuan berhasil dikirim!');
             
-            // === KIRIM EMAIL KE KETUA KSM ===
-            await sendEmailNotif(
-                'ketua_ksm',
-                {
-                    id: data,
-                    nama_obat: payload.p_nama_obat,
-                    pengaju: currentUserProfile
-                },
-                'Menunggu Persetujuan',
-                'Pengajuan baru menunggu review Anda',
-                supabaseClient
-            );
+            // === KIRIM EMAIL KE KETUA KSM (opsional, tidak akan crash jika gagal) ===
+            try {
+                if (typeof sendEmailNotif === 'function') {
+                    await sendEmailNotif(
+                        'ketua_ksm',
+                        {
+                            id: data,
+                            nama_obat: payload.p_nama_obat,
+                            pengaju: currentUserProfile
+                        },
+                        'Menunggu Persetujuan',
+                        'Pengajuan baru menunggu review Anda',
+                        supabaseClient
+                    );
+                } else {
+                    console.warn('emailHelper.js tidak ditemukan. Email dilewati.');
+                }
+            } catch (emailErr) {
+                console.error('Email gagal, tapi pengajuan tetap berhasil:', emailErr);
+            }
             
             window.location.href = 'dashboard.html';
         });
