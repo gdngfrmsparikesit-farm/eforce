@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengajuan Pengadaan Reguler - E-Force</title>
+    <title>Detail Pengajuan - E-Force</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         .bg-rsud { background-color: #059669; }
         .text-rsud { color: #059669; }
-        .border-rsud { border-color: #059669; }
         .step-active { background-color: #059669; color: white; border-color: #059669; }
+        .step-done { background-color: #22c55e; color: white; border-color: #22c55e; }
         .step-inactive { background-color: white; color: #9ca3af; border-color: #e5e7eb; }
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
 
-    <!-- Header -->
     <header class="bg-white shadow-sm border-b sticky top-0 z-10">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <div class="h-10 w-32 bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs font-semibold">RSUD AMP</div>
-            </div>
+            <div class="h-10 w-32 bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs font-semibold">RSUD AMP</div>
             <div class="flex items-center gap-3">
                 <a href="panduan.html" class="bg-rsud text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-emerald-700 transition">Cara Penggunaan</a>
                 <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-600 transition">Sign Out</button>
@@ -31,214 +31,541 @@
 
     <main class="max-w-4xl mx-auto px-4 py-8">
 
-        <!-- Breadcrumb -->
         <nav class="text-sm text-gray-500 mb-3">
             <a href="dashboard.html" class="hover:text-emerald-600">🏠 Dashboard</a>
             <span class="mx-2">›</span>
-            <span class="text-rsud font-medium">Ajukan Obat Baru</span>
+            <span class="text-rsud font-medium">Detail Pengajuan</span>
         </nav>
 
-        <!-- Tombol Kembali -->
-        <a href="dashboard.html" class="inline-flex items-center gap-2 px-4 py-2 border border-emerald-300 text-rsud rounded-full text-sm hover:bg-emerald-50 transition mb-6">
-            <span>‹</span> Kembali Ke Halaman Awal
-        </a>
-
-        <!-- Progress Bar -->
-        <div class="flex items-center justify-between mb-8 px-4">
-            <div class="flex flex-col items-center flex-1">
-                <div class="w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold step-active">1</div>
-                <span class="text-xs mt-2 text-gray-700 text-center">Admin KSM</span>
-            </div>
-            <div class="flex-1 h-0.5 bg-gray-300 -mt-6"></div>
-            <div class="flex flex-col items-center flex-1">
-                <div class="w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold step-inactive">2</div>
-                <span class="text-xs mt-2 text-gray-500 text-center">Ketua KSM</span>
-            </div>
-            <div class="flex-1 h-0.5 bg-gray-300 -mt-6"></div>
-            <div class="flex flex-col items-center flex-1">
-                <div class="w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold step-inactive">3</div>
-                <span class="text-xs mt-2 text-gray-500 text-center">Anggota PFT</span>
-            </div>
-            <div class="flex-1 h-0.5 bg-gray-300 -mt-6"></div>
-            <div class="flex flex-col items-center flex-1">
-                <div class="w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold step-inactive">4</div>
-                <span class="text-xs mt-2 text-gray-500 text-center">Ketua PFT</span>
-            </div>
-            <div class="flex-1 h-0.5 bg-gray-300 -mt-6"></div>
-            <div class="flex flex-col items-center flex-1">
-                <div class="w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold step-inactive">5</div>
-                <span class="text-xs mt-2 text-gray-500 text-center">Wakil Direktur</span>
-            </div>
+        <div class="flex justify-between items-center mb-6">
+            <a href="dashboard.html" class="inline-flex items-center gap-2 px-4 py-2 border border-emerald-300 text-rsud rounded-full text-sm hover:bg-emerald-50 transition">
+                <span>‹</span> Kembali Ke Halaman Awal
+            </a>
+            <button id="printDetailBtn" class="inline-flex items-center gap-2 px-4 py-2 bg-rsud text-white rounded-full text-sm hover:bg-emerald-700 transition">
+                🖨️ Cetak PDF
+            </button>
         </div>
 
-        <!-- Form Card -->
-        <div class="bg-white rounded-2xl border border-emerald-200 shadow-sm p-8">
-            <h1 class="text-2xl font-bold text-rsud text-center mb-8">Pengajuan Pengadaan Reguler</h1>
+        <div id="progressBar" class="flex items-center justify-between mb-8 px-4"></div>
 
-            <form id="pengajuanForm" class="space-y-6">
-                
-                <!-- Tanggal Pengajuan -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Pengajuan <span class="text-red-500">*</span></label>
-                    <input type="date" id="tanggalPengajuan" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
-                </div>
+        <div id="loadingState" class="text-center py-12 text-gray-400">Memuat data pengajuan...</div>
+        <div id="errorState" class="hidden bg-red-50 border border-red-300 rounded-2xl p-6 text-center text-red-700 text-sm"></div>
+        <div id="contentArea" class="hidden space-y-4"></div>
 
-                <!-- Nama Obat -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Obat <span class="text-red-500">*</span></label>
-                    <input type="text" id="namaObat" required placeholder="Contoh: Vitamin" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
-                </div>
-
-                <!-- EBM & PPK/Konsensus -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">EBM & PPK/Konsensus <span class="text-red-500">*</span></label>
-                    <div id="ebmContainer" class="border border-gray-200 rounded-lg p-4 space-y-3 bg-gray-50">
-                        <!-- Baris EBM akan ditambahkan oleh JS -->
-                    </div>
-                    <button type="button" id="tambahEbmBtn" class="mt-3 bg-rsud text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-emerald-700 transition flex items-center gap-1">
-                        <span>+</span> Tambah Baru
-                    </button>
-                </div>
-
-                <!-- Alasan Pengajuan -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Alasan Pengajuan <span class="text-red-500">*</span></label>
-                    <textarea id="alasanPengajuan" required rows="4" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none"></textarea>
-                </div>
-
-                <!-- Pemberi Persetujuan -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Pemberi Persetujuan <span class="text-red-500">*</span></label>
-                    <select id="pemberiPersetujuan" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none bg-white">
-                        <option value="">-- Pilih Pemberi Persetujuan --</option>
-                        <option value="Ketua KSM Jantung">Ketua KSM Jantung</option>
-                        <option value="Ketua KSM Saraf dan Jiwa">Ketua KSM Saraf dan Jiwa</option>
-                        <option value="Ketua KSM Bedah Gigi & Mulut">Ketua KSM Bedah Gigi & Mulut</option>
-                        <option value="Ketua KSM Paru">Ketua KSM Paru</option>
-                        <option value="Ketua KSM Kulit">Ketua KSM Kulit</option>
-                        <option value="Ketua KSM Penunjang">Ketua KSM Penunjang</option>
-                        <option value="Ketua KSM Umum">Ketua KSM Umum</option>
-                        <option value="Ketua KSM IPD">Ketua KSM IPD</option>
-                    </select>
-                </div>
-
-                <!-- Submit -->
-                <div class="pt-4">
-                    <button type="submit" id="submitBtn" class="w-full bg-rsud text-white font-semibold py-3 rounded-full hover:bg-emerald-700 transition">
-                        Submit
-                    </button>
-                </div>
-
-                <p id="errorMsg" class="text-red-500 text-sm text-center hidden"></p>
-            </form>
-        </div>
     </main>
 
+    <script src="emailHelper.js"></script>
     <script>
         const SUPABASE_URL = 'https://liyjnpjawjkobopwuhnb.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpeWpucGphd2prb2JvcHd1aG5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2Mjk5MTMsImV4cCI6MjEwNTIwNTkxM30.xAZRyHQQf2c1jYOIlcUpy_XnwScwSdg6bs8on7_t1Nw';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ====== CEK AUTENTIKASI ======
-        async function checkAuth() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
-                window.location.href = 'index.html';
-                return;
-            }
-            document.getElementById('tanggalPengajuan').valueAsDate = new Date();
-            tambahBarisEbm();
+        let currentUser = null;
+        let pengajuan = null;
+        let riwayat = [];
+        let pengajuanId = null;
+
+        const STEPS = [
+            { key: 1, label: 'Admin KSM' },
+            { key: 2, label: 'Ketua KSM' },
+            { key: 3, label: 'Anggota PFT' },
+            { key: 4, label: 'Ketua PFT' },
+            { key: 5, label: 'Wakil Direktur' }
+        ];
+
+        function relativeTime(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffSec = Math.floor((now - date) / 1000);
+            const diffMin = Math.floor(diffSec / 60);
+            const diffHour = Math.floor(diffMin / 60);
+            const diffDay = Math.floor(diffHour / 24);
+            if (diffSec < 60) return 'baru saja';
+            if (diffMin < 60) return `${diffMin} menit lalu`;
+            if (diffHour < 24) return `${diffHour} jam lalu`;
+            if (diffDay < 7) return `${diffDay} hari lalu`;
+            return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
         }
 
-        // ====== LOGIKA EBM MULTI-ROW ======
-        function tambahBarisEbm() {
-            const container = document.getElementById('ebmContainer');
-            const row = document.createElement('div');
-            row.className = 'ebm-row flex gap-2 items-center';
-            row.innerHTML = `
-                <select class="ebm-tipe px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none w-32">
-                    <option value="EBM">EBM</option>
-                    <option value="PPK">PPK</option>
-                    <option value="Konsensus">Konsensus</option>
-                </select>
-                <input type="text" class="ebm-nama flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Nama (contoh: EBM Vita)">
-                <input type="text" class="ebm-link flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Link (contoh: https://...)">
-                <button type="button" class="hapus-ebm text-red-500 hover:text-red-700 px-2 text-xl font-bold" title="Hapus">🗑</button>
-            `;
-            row.querySelector('.hapus-ebm').addEventListener('click', () => {
-                if (container.querySelectorAll('.ebm-row').length > 1) {
-                    row.remove();
-                } else {
-                    alert('Minimal harus ada 1 baris EBM/PPK.');
+        function showError(msg) {
+            document.getElementById('loadingState').classList.add('hidden');
+            const errEl = document.getElementById('errorState');
+            errEl.textContent = msg;
+            errEl.classList.remove('hidden');
+            console.error('ERROR DETAIL:', msg);
+        }
+
+        async function init() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                pengajuanId = params.get('id');
+                if (!pengajuanId) {
+                    alert('ID pengajuan tidak ditemukan di URL.');
+                    window.location.href = 'dashboard.html';
+                    return;
                 }
-            });
-            container.appendChild(row);
+
+                const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+                if (sessionError || !session) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                const { data: profile } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('id', session.user.id)
+                    .maybeSingle();
+
+                if (!profile) {
+                    showError('Akun Anda belum terdaftar di sistem. Hubungi admin untuk mendaftarkan akun Anda di tabel users.');
+                    return;
+                }
+                currentUser = profile;
+
+                const { data: pData, error: pError } = await supabaseClient
+                    .from('pengajuan')
+                    .select('*, pengaju:admin_ksm_id (nama_lengkap, ksm)')
+                    .eq('id', pengajuanId)
+                    .maybeSingle();
+
+                if (pError) {
+                    showError('Gagal memuat pengajuan: ' + pError.message);
+                    return;
+                }
+                if (!pData) {
+                    showError('Pengajuan tidak ditemukan.');
+                    return;
+                }
+                pengajuan = pData;
+
+                const { data: rData } = await supabaseClient
+                    .from('riwayat_pengajuan')
+                    .select('*, user:user_id (nama_lengkap, role)')
+                    .eq('pengajuan_id', pengajuanId)
+                    .order('created_at', { ascending: true });
+                riwayat = rData || [];
+
+                renderProgressBar();
+                renderContent();
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('contentArea').classList.remove('hidden');
+
+            } catch (err) {
+                console.error('FATAL ERROR:', err);
+                showError('Terjadi kesalahan tak terduga: ' + err.message);
+            }
         }
 
-        document.getElementById('tambahEbmBtn').addEventListener('click', tambahBarisEbm);
+        function renderProgressBar() {
+            const currentStep = pengajuan.current_step;
+            const container = document.getElementById('progressBar');
+            let html = '';
+            STEPS.forEach((step, idx) => {
+                let cls = 'step-inactive';
+                let inner = step.key;
+                if (step.key < currentStep) { cls = 'step-done'; inner = '✓'; }
+                else if (step.key === currentStep) { cls = 'step-active'; }
+                html += `
+                    <div class="flex flex-col items-center flex-1">
+                        <div class="w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold ${cls}">${inner}</div>
+                        <span class="text-xs mt-2 text-gray-700 text-center">${step.label}</span>
+                    </div>
+                `;
+                if (idx < STEPS.length - 1) html += `<div class="flex-1 h-0.5 bg-gray-300 -mt-6"></div>`;
+            });
+            container.innerHTML = html;
+        }
 
-        // ====== SUBMIT FORM ======
-        document.getElementById('pengajuanForm').addEventListener('submit', async (e) => {
+        function collapsibleSection(title, contentHtml, defaultOpen = false) {
+            return `
+                <details ${defaultOpen ? 'open' : ''} class="bg-rsud rounded-lg overflow-hidden shadow-sm">
+                    <summary class="bg-rsud text-white px-5 py-3 flex justify-between items-center font-medium">
+                        <span>${title}</span>
+                        <span class="text-xl">⌄</span>
+                    </summary>
+                    <div class="bg-white p-6 border border-t-0 border-emerald-200 rounded-b-lg">
+                        ${contentHtml}
+                    </div>
+                </details>
+            `;
+        }
+
+        function fieldRow(label, value) {
+            return `
+                <div class="mb-3">
+                    <div class="text-xs text-gray-500 uppercase tracking-wide mb-1">${label}</div>
+                    <div class="text-sm text-gray-800 bg-gray-50 rounded px-3 py-2 border border-gray-200">${value || '-'}</div>
+                </div>
+            `;
+        }
+
+        function renderFormAdminKSM() {
+            let ebmHtml = '';
+            const ebmList = pengajuan.ebm_ppk || [];
+            if (ebmList.length > 0) {
+                ebmHtml = ebmList.map(e => 
+                    `<div class="flex gap-2 mb-2 text-sm items-center">
+                        <span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-medium">${e.tipe}</span>
+                        <span class="text-gray-800">${e.nama}</span>
+                        ${e.link ? `<a href="${e.link}" target="_blank" class="text-blue-600 hover:underline text-xs">Link</a>` : ''}
+                    </div>`
+                ).join('');
+            } else {
+                ebmHtml = '<div class="text-gray-400 text-sm">-</div>';
+            }
+            return `
+                ${fieldRow('Tanggal Pengajuan', new Date(pengajuan.tanggal_pengajuan).toLocaleDateString('id-ID'))}
+                ${fieldRow('Nama Obat', pengajuan.nama_obat)}
+                <div class="mb-3">
+                    <div class="text-xs text-gray-500 uppercase tracking-wide mb-1">EBM & PPK/Konsensus</div>
+                    <div class="bg-gray-50 rounded px-3 py-2 border border-gray-200">${ebmHtml}</div>
+                </div>
+                ${fieldRow('Alasan Pengajuan', pengajuan.alasan_pengajuan)}
+                ${fieldRow('Pemberi Persetujuan', pengajuan.pemberi_persetujuan)}
+            `;
+        }
+
+        function renderFormKetuaKSM() {
+            return fieldRow('Kriteria Restriksi', pengajuan.kriteria_restriksi);
+        }
+
+        function renderFormAnggotaPFT() {
+            const df = pengajuan.data_farmasi || {};
+            return `
+                ${fieldRow('Keterangan Obat', df.keterangan_obat)}
+                <div class="grid grid-cols-2 gap-3">
+                    <div>${fieldRow('Jenis Obat', df.jenis_obat)}</div>
+                    <div>${fieldRow('Nama Obat', df.nama_obat || pengajuan.nama_obat)}</div>
+                </div>
+                ${fieldRow('Harga Obat', df.harga_obat ? 'Rp ' + Number(df.harga_obat).toLocaleString('id-ID') : null)}
+                ${fieldRow('Kategori Obat', df.kategori_obat)}
+                ${fieldRow('Termasuk Kronis', df.is_kronis)}
+                ${fieldRow('Informasi Keamanan', df.info_keamanan)}
+                ${fieldRow('Obat Alternatif', df.obat_alternatif)}
+                ${fieldRow('Harga Alternatif', df.harga_alternatif ? 'Rp ' + Number(df.harga_alternatif).toLocaleString('id-ID') : null)}
+            `;
+        }
+
+        function renderFormApprover(roleName) {
+            const log = riwayat.find(r => r.role === roleName && r.aksi === 'approve');
+            if (!log) return '<div class="text-gray-400 text-sm">Belum ada catatan.</div>';
+            return `
+                ${fieldRow('Rekomendasi', log.catatan)}
+                ${fieldRow('Disetujui Oleh', log.user?.nama_lengkap || 'Unknown')}
+                ${fieldRow('Tanggal Approve', new Date(log.created_at).toLocaleString('id-ID'))}
+                ${fieldRow('Waktu', relativeTime(log.created_at))}
+            `;
+        }
+
+        function renderRiwayatLog() {
+            if (riwayat.length === 0) return '<div class="text-gray-400 text-sm">Belum ada riwayat.</div>';
+            return riwayat.map(r => {
+                const roleLabel = r.role ? r.role.replace(/_/g, ' ').toUpperCase() : 'UNKNOWN';
+                const aksiLabel = r.aksi ? r.aksi.toUpperCase() : '-';
+                const dotColor = r.aksi === 'approve' ? 'bg-green-500' : r.aksi === 'reject' ? 'bg-red-500' : 'bg-blue-500';
+                const aksiIcon = r.aksi === 'approve' ? '✅' : r.aksi === 'reject' ? '❌' : '📝';
+                return `
+                    <div class="flex gap-3 mb-3 pb-3 border-b border-gray-100 last:border-0">
+                        <div class="w-2 h-2 rounded-full ${dotColor} mt-2 flex-shrink-0"></div>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-800">
+                                ${r.user?.nama_lengkap || 'Unknown'} 
+                                <span class="text-xs text-gray-500">(${roleLabel})</span>
+                            </div>
+                            <div class="text-xs text-gray-500 mb-1">
+                                ${new Date(r.created_at).toLocaleString('id-ID')} • ${aksiIcon} ${aksiLabel} • ${relativeTime(r.created_at)}
+                            </div>
+                            ${r.catatan ? `<div class="text-sm text-gray-700 bg-gray-50 rounded px-3 py-2">${r.catatan}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderContent() {
+            if (!currentUser || !pengajuan) return;
+
+            const container = document.getElementById('contentArea');
+            const step = pengajuan.current_step;
+            const role = currentUser.role;
+            let html = '';
+
+            html += collapsibleSection('Lihat Form Pengajuan Admin KSM', renderFormAdminKSM());
+            if (step >= 3) html += collapsibleSection('Lihat Form Pengajuan Ketua KSM', renderFormKetuaKSM());
+            if (step >= 4) html += collapsibleSection('Lihat Form Pengajuan Anggota PFT', renderFormAnggotaPFT());
+            if (step >= 5) html += collapsibleSection('Lihat Form Pengajuan Ketua PFT', renderFormApprover('ketua_pft'));
+            if (step >= 6) html += collapsibleSection('Lihat Form Pengajuan Wadir', renderFormApprover('wadir'));
+
+            html += `<div class="bg-white rounded-2xl border border-emerald-200 shadow-sm p-6">
+                <h3 class="text-lg font-bold text-rsud mb-4">📜 Riwayat Approval</h3>
+                ${renderRiwayatLog()}
+            </div>`;
+
+            const isMyTurn = (
+                (step === 2 && role === 'ketua_ksm') ||
+                (step === 3 && role === 'anggota_pft') ||
+                (step === 4 && role === 'ketua_pft') ||
+                (step === 5 && role === 'wadir')
+            );
+
+            if (isMyTurn) {
+                html += `<div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mb-2">
+                    <div class="flex items-center gap-2 text-yellow-800 font-medium">
+                        <span class="text-xl">⚡</span>
+                        <span>Ini giliran Anda untuk memproses pengajuan ini.</span>
+                    </div>
+                </div>`;
+
+                html += `<div class="bg-white rounded-2xl border border-emerald-200 shadow-sm p-8">
+                    <h2 class="text-xl font-bold text-rsud text-center mb-6">Pengajuan Pengadaan Reguler</h2>
+                    <form id="actionForm" class="space-y-5">`;
+
+                if (role === 'ketua_ksm') {
+                    html += `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Kriteria Restriksi <span class="text-red-500">*</span></label>
+                            <input type="text" id="inputKriteria" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tinjau Pengajuan <span class="text-red-500">*</span></label>
+                            <textarea id="inputCatatan" required rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none resize-none"></textarea>
+                        </div>
+                    `;
+                } else if (role === 'anggota_pft') {
+                    html += `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Keterangan Obat <span class="text-red-500">*</span></label>
+                            <select id="inputKeterangan" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-emerald-500">
+                                <option value="">-- Pilih --</option>
+                                <option value="Obat Baru">Obat Baru</option>
+                                <option value="Obat Lama">Obat Lama</option>
+                                <option value="Pengganti">Pengganti</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Obat <span class="text-red-500">*</span></label>
+                                <select id="inputJenis" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-emerald-500">
+                                    <option value="">-- Pilih --</option>
+                                    <option value="Tablet">Tablet</option>
+                                    <option value="Kapsul">Kapsul</option>
+                                    <option value="Sirup">Sirup</option>
+                                    <option value="Injeksi">Injeksi</option>
+                                    <option value="Salep">Salep</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Obat <span class="text-red-500">*</span></label>
+                                <input type="text" id="inputNamaObat" required value="${pengajuan.nama_obat}" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Harga Obat <span class="text-red-500">*</span></label>
+                            <input type="number" id="inputHarga" required min="0" value="0" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Kategori Obat <span class="text-red-500">*</span></label>
+                            <select id="inputKategori" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-emerald-500">
+                                <option value="">-- Pilih --</option>
+                                <option value="Generik">Generik</option>
+                                <option value="Paten">Paten</option>
+                                <option value="Generik Bermerek">Generik Bermerek</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Termasuk dalam Kronis? <span class="text-red-500">*</span></label>
+                            <select id="inputKronis" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-emerald-500">
+                                <option value="">-- Pilih --</option>
+                                <option value="Ya">Ya</option>
+                                <option value="Tidak">Tidak</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Informasi Keamanan Obat</label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center gap-2 text-sm"><input type="radio" name="infoKeamanan" value="Ya" class="w-4 h-4"> Ya</label>
+                                <label class="flex items-center gap-2 text-sm"><input type="radio" name="infoKeamanan" value="Tidak" checked class="w-4 h-4"> Tidak</label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Obat Alternatif Pengganti</label>
+                            <input type="text" id="inputAlternatif" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Harga Obat Alternatif Pengganti</label>
+                            <input type="number" id="inputHargaAlternatif" min="0" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+                        </div>
+                    `;
+                } else if (role === 'ketua_pft' || role === 'wadir') {
+                    html += `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Rekomendasi <span class="text-red-500">*</span></label>
+                            <textarea id="inputCatatan" required rows="4" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 resize-none"></textarea>
+                        </div>
+                    `;
+                }
+
+                if (role === 'anggota_pft') {
+                    html += `<button type="submit" id="submitBtn" class="w-full bg-rsud text-white font-semibold py-3 rounded-full hover:bg-emerald-700 transition">Submit</button>`;
+                } else if (role === 'wadir') {
+                    html += `<button type="submit" id="submitBtn" class="w-full bg-green-500 text-white font-semibold py-3 rounded-full hover:bg-green-600 transition">✅ Approve Final</button>`;
+                } else {
+                    html += `
+                        <div class="grid grid-cols-2 gap-4 pt-2">
+                            <button type="button" id="rejectBtn" class="bg-red-500 text-white font-semibold py-3 rounded-full hover:bg-red-600 transition">❌ Reject</button>
+                            <button type="submit" id="submitBtn" class="bg-green-500 text-white font-semibold py-3 rounded-full hover:bg-green-600 transition">✅ Approve</button>
+                        </div>
+                    `;
+                }
+
+                html += `<p id="errorMsg" class="text-red-500 text-sm text-center hidden"></p>`;
+                html += `</form></div>`;
+            } else if (step === 6) {
+                html += `<div class="bg-green-50 border border-green-300 rounded-2xl p-6 text-center text-green-700 font-semibold">✓ Pengajuan ini sudah DISETUJUI sepenuhnya.</div>`;
+            } else {
+                html += `<div class="bg-yellow-50 border border-yellow-300 rounded-2xl p-6 text-center text-yellow-700 text-sm">⏳ Menunggu giliran role lain untuk memproses pengajuan ini.</div>`;
+            }
+
+            container.innerHTML = html;
+
+            const form = document.getElementById('actionForm');
+            if (form) {
+                form.addEventListener('submit', handleApprove);
+                const rejectBtn = document.getElementById('rejectBtn');
+                if (rejectBtn) rejectBtn.addEventListener('click', handleReject);
+            }
+        }
+
+        async function handleApprove(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             const errorMsg = document.getElementById('errorMsg');
-            
-            btn.textContent = 'Mengirim...';
+            btn.textContent = 'Memproses...';
             btn.disabled = true;
             errorMsg.classList.add('hidden');
 
-            const ebmRows = document.querySelectorAll('.ebm-row');
-            const ebmData = [];
-            ebmRows.forEach(row => {
-                const tipe = row.querySelector('.ebm-tipe').value;
-                const nama = row.querySelector('.ebm-nama').value.trim();
-                const link = row.querySelector('.ebm-link').value.trim();
-                if (nama) {
-                    ebmData.push({ tipe, nama, link });
-                }
+            const role = currentUser.role;
+            let catatan = '';
+            let kriteria = null;
+            let farmasi = null;
+
+            if (role === 'ketua_ksm') {
+                kriteria = document.getElementById('inputKriteria').value;
+                catatan = document.getElementById('inputCatatan').value;
+            } else if (role === 'anggota_pft') {
+                const infoKeamanan = document.querySelector('input[name="infoKeamanan"]:checked')?.value || 'Tidak';
+                farmasi = {
+                    keterangan_obat: document.getElementById('inputKeterangan').value,
+                    jenis_obat: document.getElementById('inputJenis').value,
+                    nama_obat: document.getElementById('inputNamaObat').value,
+                    harga_obat: parseInt(document.getElementById('inputHarga').value) || 0,
+                    kategori_obat: document.getElementById('inputKategori').value,
+                    is_kronis: document.getElementById('inputKronis').value,
+                    info_keamanan: infoKeamanan,
+                    obat_alternatif: document.getElementById('inputAlternatif').value,
+                    harga_alternatif: parseInt(document.getElementById('inputHargaAlternatif').value) || 0
+                };
+                catatan = 'Data farmasi telah dilengkapi';
+            } else {
+                catatan = document.getElementById('inputCatatan').value;
+            }
+
+            const { error } = await supabaseClient.rpc('approve_pengajuan', {
+                p_id: pengajuanId,
+                p_catatan: catatan,
+                p_kriteria_restriksi: kriteria,
+                p_data_farmasi: farmasi
             });
 
-            if (ebmData.length === 0) {
-                errorMsg.textContent = 'Minimal isi 1 nama EBM/PPK/Konsensus.';
+            if (error) {
+                errorMsg.textContent = 'Gagal: ' + error.message;
                 errorMsg.classList.remove('hidden');
-                btn.textContent = 'Submit';
+                btn.textContent = role === 'anggota_pft' ? 'Submit' : '✅ Approve';
                 btn.disabled = false;
                 return;
             }
 
-            const payload = {
-                p_tanggal: document.getElementById('tanggalPengajuan').value,
-                p_nama_obat: document.getElementById('namaObat').value,
-                p_ebm_ppk: ebmData,
-                p_alasan: document.getElementById('alasanPengajuan').value,
-                p_pemberi_persetujuan: document.getElementById('pemberiPersetujuan').value
+            alert('Berhasil! Email notifikasi sedang dikirim...');
+            
+            // === KIRIM EMAIL KE ROLE BERIKUTNYA ===
+            const nextRoleMap = {
+                'ketua_ksm':   { next: 'anggota_pft',  status: 'Menunggu Persetujuan' },
+                'anggota_pft': { next: 'ketua_pft',    status: 'Menunggu Persetujuan' },
+                'ketua_pft':   { next: 'wadir',        status: 'Menunggu Persetujuan' },
+                'wadir':       { next: 'admin_ksm',    status: 'Dikonfirmasi ✅' }
             };
+            
+            const nextInfo = nextRoleMap[role];
+            if (nextInfo) {
+                await sendEmailNotif(
+                    nextInfo.next,
+                    {
+                        id: pengajuanId,
+                        nama_obat: pengajuan.nama_obat,
+                        pengaju: pengajuan.pengaju
+                    },
+                    nextInfo.status,
+                    catatan,
+                    supabaseClient
+                );
+            }
+            
+            window.location.reload();
+        }
 
-            console.log('Mengirim data:', payload);
+        async function handleReject() {
+            const catatan = prompt('Masukkan alasan penolakan:');
+            if (!catatan) return;
 
-            const { data, error } = await supabaseClient.rpc('submit_pengajuan', payload);
+            const { error } = await supabaseClient.rpc('reject_pengajuan', {
+                p_id: pengajuanId,
+                p_catatan: catatan
+            });
 
             if (error) {
-                console.error('Error saat submit:', error);
-                errorMsg.textContent = 'Gagal submit: ' + error.message;
-                errorMsg.classList.remove('hidden');
-                btn.textContent = 'Submit';
-                btn.disabled = false;
+                alert('Gagal reject: ' + error.message);
                 return;
             }
 
-            console.log('Berhasil submit. ID:', data);
-            alert('Pengajuan berhasil dikirim!');
-            window.location.href = 'dashboard.html';
-        });
+            alert('Pengajuan ditolak. Email notifikasi sedang dikirim...');
+            
+            // === KIRIM EMAIL REJECT KE ROLE SEBELUMNYA ===
+            const stepBefore = {
+                2: 'admin_ksm',
+                3: 'ketua_ksm',
+                4: 'anggota_pft',
+                5: 'ketua_pft'
+            };
+            const targetRole = stepBefore[pengajuan.current_step];
+            
+            if (targetRole) {
+                await sendEmailNotif(
+                    targetRole,
+                    {
+                        id: pengajuanId,
+                        nama_obat: pengajuan.nama_obat,
+                        pengaju: pengajuan.pengaju
+                    },
+                    'Tidak Dikonfirmasi ❌',
+                    catatan,
+                    supabaseClient
+                );
+            }
+            
+            window.location.reload();
+        }
 
-        // ====== LOGOUT ======
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             await supabaseClient.auth.signOut();
             window.location.href = 'index.html';
         });
 
-        checkAuth();
+        document.getElementById('printDetailBtn').addEventListener('click', () => {
+            window.open('cetak.html?id=' + pengajuanId, '_blank');
+        });
+
+        init();
     </script>
 </body>
 </html>
