@@ -4,16 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - E-Force</title>
-    
-    <!-- 1. Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- 2. Library Supabase (INI YANG SEBELUMNYA HILANG) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        .bg-rsud { background-color: #d97746; }
-        .text-rsud { color: #d97746; }
+        .bg-rsud { background-color: #059669; }
+        .bg-rsud-dark { background-color: #047857; }
+        .text-rsud { color: #059669; }
+        .border-rsud { border-color: #059669; }
+        
+        /* Loading skeleton animation */
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .skeleton { animation: pulse-slow 1.5s ease-in-out infinite; }
+        
+        /* Stat card active state */
+        .stat-card {
+            transition: all 0.2s ease;
+            border: 3px solid transparent;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        .stat-card.active {
+            border-color: #065f46;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(5,150,105,0.4);
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
@@ -22,53 +42,97 @@
     <header class="bg-white shadow-sm border-b sticky top-0 z-10">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <!-- Placeholder Logo (Mengganti URL yang error) -->
-                <div class="h-10 w-32 bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs font-semibold">
-                    RSUD AMP
-                </div>
+                <div class="h-10 w-32 bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs font-semibold">RSUD AMP</div>
             </div>
             <div class="flex items-center gap-3">
-                <button class="bg-rsud text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-orange-700 transition">Cara Penggunaan</button>
+                <button class="bg-rsud text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-emerald-700 transition">Cara Penggunaan</button>
                 <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-600 transition">Sign Out</button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 py-8">
-        <!-- Greeting -->
-        <h1 id="greeting" class="text-xl font-bold text-gray-800 mb-4">Halo, Memuat data...</h1>
+    <main class="max-w-7xl mx-auto px-4 py-6">
 
-        <!-- Filter Section (Orange Box) -->
+        <!-- Breadcrumb -->
+        <nav class="text-sm text-gray-500 mb-3">
+            <span class="text-rsud font-medium">🏠 Dashboard</span>
+        </nav>
+
+        <!-- Greeting -->
+        <h1 id="greeting" class="text-xl font-bold text-gray-800 mb-5">Halo, Memuat data...</h1>
+
+        <!-- ====== STAT CARDS ====== -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <button data-tab="tugas-saya" class="stat-card bg-rsud text-white rounded-xl p-5 text-left active">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-3xl">📌</span>
+                    <span class="text-xs font-medium bg-white/20 px-2 py-1 rounded-full">Fokus</span>
+                </div>
+                <div class="text-3xl font-bold" id="countTugasSaya">-</div>
+                <div class="text-sm opacity-90 mt-1">Tugas Saya</div>
+            </button>
+
+            <button data-tab="semua" class="stat-card bg-white border border-gray-200 text-gray-700 rounded-xl p-5 text-left">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-3xl">📋</span>
+                </div>
+                <div class="text-3xl font-bold text-gray-800" id="countSemua">-</div>
+                <div class="text-sm text-gray-500 mt-1">Semua Pengajuan</div>
+            </button>
+
+            <button data-tab="disetujui" class="stat-card bg-white border border-gray-200 text-gray-700 rounded-xl p-5 text-left">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-3xl">✅</span>
+                </div>
+                <div class="text-3xl font-bold text-green-600" id="countDisetujui">-</div>
+                <div class="text-sm text-gray-500 mt-1">Disetujui</div>
+            </button>
+
+            <button data-tab="ditolak" class="stat-card bg-white border border-gray-200 text-gray-700 rounded-xl p-5 text-left">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-3xl">❌</span>
+                </div>
+                <div class="text-3xl font-bold text-red-600" id="countDitolak">-</div>
+                <div class="text-sm text-gray-500 mt-1">Ditolak</div>
+            </button>
+        </div>
+
+        <!-- ====== FILTER BOX ====== -->
         <div class="bg-rsud rounded-xl p-6 mb-6 shadow-md">
             <h2 class="text-2xl font-bold text-white mb-4">Daftar Pengajuan Obat</h2>
             
             <div class="mb-4">
-                <input type="text" id="searchObat" placeholder="Nama Obat" class="w-full px-4 py-2.5 rounded-lg border-none focus:ring-2 focus:ring-orange-300 outline-none">
+                <input type="text" id="searchObat" placeholder="🔍 Cari Nama Obat..." class="w-full px-4 py-2.5 rounded-lg border-none focus:ring-2 focus:ring-emerald-300 outline-none">
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                 <div>
                     <label class="block text-sm text-white mb-1">Dari Tanggal</label>
-                    <input type="date" id="dariTanggal" class="w-full px-3 py-2 rounded-lg border-none focus:ring-2 focus:ring-orange-300 outline-none">
+                    <input type="date" id="dariTanggal" class="w-full px-3 py-2 rounded-lg border-none focus:ring-2 focus:ring-emerald-300 outline-none">
                 </div>
                 <div>
                     <label class="block text-sm text-white mb-1">Sampai Tanggal</label>
-                    <input type="date" id="sampaiTanggal" class="w-full px-3 py-2 rounded-lg border-none focus:ring-2 focus:ring-orange-300 outline-none">
+                    <input type="date" id="sampaiTanggal" class="w-full px-3 py-2 rounded-lg border-none focus:ring-2 focus:ring-emerald-300 outline-none">
                 </div>
                 <div>
                     <label class="block text-sm text-white mb-1">Tipe Pengajuan</label>
-                    <select id="tipePengajuan" class="w-full px-3 py-2 rounded-lg border-none focus:ring-2 focus:ring-orange-300 outline-none bg-white">
+                    <select id="tipePengajuan" class="w-full px-3 py-2 rounded-lg border-none focus:ring-2 focus:ring-emerald-300 outline-none bg-white">
                         <option value="">Semua</option>
                         <option value="reguler">Reguler</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-sm text-white mb-1">Ketua KSM</label>
-                    <select id="filterKsm" class="w-full px-3 py-2 rounded-lg border-none focus:ring-2 focus:ring-orange-300 outline-none bg-white">
+                    <select id="filterKsm" class="w-full px-3 py-2 rounded-lg border-none focus:ring-2 focus:ring-emerald-300 outline-none bg-white">
                         <option value="">Semua</option>
+                        <option value="Anak-Jtg-Saraf-Gilut">Anak-Jtg-Saraf-Gilut</option>
                         <option value="Jantung">Jantung</option>
                         <option value="Syaraf dan Jiwa">Syaraf dan Jiwa</option>
+                        <option value="Bedah Gigi & Mulut">Bedah Gigi & Mulut</option>
+                        <option value="Paru">Paru</option>
+                        <option value="Kulit">Kulit</option>
+                        <option value="Penunjang">Penunjang</option>
+                        <option value="Umum">Umum</option>
                         <option value="IPD">IPD</option>
                     </select>
                 </div>
@@ -80,17 +144,20 @@
             </div>
         </div>
 
-        <!-- Action Buttons -->
+        <!-- ====== ACTION BUTTONS ====== -->
         <div class="flex justify-between items-center mb-4">
             <button id="ajukanBtn" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 transition flex items-center gap-2">
                 <span>+</span> Ajukan Obat Baru
             </button>
-            <button class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 transition flex items-center gap-2">
+            <button id="exportBtn" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 transition flex items-center gap-2">
                 <span>⬇</span> Download Excel
             </button>
         </div>
 
-        <!-- Table Section -->
+        <!-- Info Jumlah -->
+        <div id="infoJumlah" class="text-sm text-gray-500 mb-2"></div>
+
+        <!-- ====== TABLE ====== -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <table class="w-full text-left border-collapse">
                 <thead>
@@ -104,25 +171,80 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody" class="text-gray-700 text-sm divide-y divide-gray-100">
-                    <tr>
-                        <td colspan="6" class="p-8 text-center text-gray-400">Memuat data...</td>
-                    </tr>
+                    <!-- Akan diisi oleh JS -->
                 </tbody>
             </table>
         </div>
     </main>
 
-    <!-- Script Kustom -->
     <script>
-        // Ganti dengan kredensial Supabase Anda
         const SUPABASE_URL = 'https://liyjnpjawjkobopwuhnb.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpeWpucGphd2prb2JvcHd1aG5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2Mjk5MTMsImV4cCI6MjEwNTIwNTkxM30.xAZRyHQQf2c1jYOIlcUpy_XnwScwSdg6bs8on7_t1Nw';
-        
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUser = null;
+        let allPengajuan = [];
+        let filteredPengajuan = [];
+        let activeTab = 'tugas-saya'; // Default tab
 
-        // Cek Sesi Login
+        // ====== UTIL: Relative Time ======
+        function relativeTime(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffSec = Math.floor(diffMs / 1000);
+            const diffMin = Math.floor(diffSec / 60);
+            const diffHour = Math.floor(diffMin / 60);
+            const diffDay = Math.floor(diffHour / 24);
+            
+            if (diffSec < 60) return 'baru saja';
+            if (diffMin < 60) return `${diffMin} menit lalu`;
+            if (diffHour < 24) return `${diffHour} jam lalu`;
+            if (diffDay < 7) return `${diffDay} hari lalu`;
+            return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        // ====== UTIL: Status Badge (Warna + Ikon) ======
+        function getStatusBadge(status) {
+            const map = {
+                'draft':               { label: 'Draft',          icon: '📝', cls: 'bg-gray-100 text-gray-700' },
+                'menunggu_ketua_ksm':  { label: 'Menunggu Ketua KSM', icon: '⏳', cls: 'bg-yellow-100 text-yellow-700' },
+                'menunggu_anggota_pft':{ label: 'Menunggu Anggota PFT', icon: '⏳', cls: 'bg-yellow-100 text-yellow-700' },
+                'menunggu_ketua_pft':  { label: 'Menunggu Ketua PFT', icon: '⏳', cls: 'bg-yellow-100 text-yellow-700' },
+                'menunggu_wadir':      { label: 'Menunggu Wadir', icon: '⏳', cls: 'bg-yellow-100 text-yellow-700' },
+                'disetujui':           { label: 'Disetujui',      icon: '✅', cls: 'bg-green-100 text-green-700' },
+                'ditolak':             { label: 'Ditolak',        icon: '❌', cls: 'bg-red-100 text-red-700' }
+            };
+            const item = map[status] || { label: status, icon: '•', cls: 'bg-gray-100 text-gray-700' };
+            return `<span class="px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1 ${item.cls}">
+                <span>${item.icon}</span> ${item.label}
+            </span>`;
+        }
+
+        // ====== UTIL: Apakah ini tugas user yang login? ======
+        function isMyTask(item) {
+            if (!currentUser) return false;
+            const role = currentUser.role;
+            const status = item.status;
+            
+            // Map role → status yang butuh tindakannya
+            const taskMap = {
+                'ketua_ksm':   'menunggu_ketua_ksm',
+                'anggota_pft': 'menunggu_anggota_pft',
+                'ketua_pft':   'menunggu_ketua_pft',
+                'wadir':       'menunggu_wadir'
+            };
+            
+            if (role === 'admin_ksm') {
+                // Admin KSM: pengajuan buatannya yang masih dalam proses (belum final)
+                return item.admin_ksm_id === currentUser.id && 
+                       !['disetujui', 'ditolak'].includes(status);
+            }
+            
+            return status === taskMap[role];
+        }
+
+        // ====== CEK AUTH ======
         async function checkAuth() {
             console.log("1. Memeriksa sesi login...");
             const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -133,9 +255,8 @@
                 return;
             }
             
-            console.log("3. Sesi ditemukan untuk user:", session.user.email);
+            console.log("3. Sesi ditemukan:", session.user.email);
             
-            // Ambil Profil User dari tabel public.users
             const { data: profile, error: profileError } = await supabaseClient
                 .from('users')
                 .select('*')
@@ -143,90 +264,261 @@
                 .single();
 
             if (profileError) {
-                console.error("4. Gagal mengambil profil dari tabel users:", profileError.message);
+                console.error("4. Gagal mengambil profil:", profileError.message);
             }
 
             if (profile) {
-                console.log("5. Profil ditemukan:", profile.nama_lengkap);
                 currentUser = profile;
-                document.getElementById('greeting').textContent = `Halo, ${profile.nama_lengkap} (${profile.role.replace('_', ' ').toUpperCase()})`;
+                document.getElementById('greeting').textContent = `Halo, ${profile.nama_lengkap} (${profile.role.replace(/_/g, ' ').toUpperCase()})`;
                 
                 if (profile.role !== 'admin_ksm') {
                     document.getElementById('ajukanBtn').style.display = 'none';
                 }
-            } else {
-                console.warn("5. Profil kosong, tetapi sesi ada. Pastikan data di tabel public.users sudah benar.");
-                document.getElementById('greeting').textContent = `Halo, ${session.user.email} (Profil belum diatur)`;
             }
             
+            renderSkeleton();
             fetchPengajuan();
         }
 
-        // Fetch Data Pengajuan
+        // ====== SKELETON LOADING ======
+        function renderSkeleton() {
+            const tbody = document.getElementById('tableBody');
+            let rows = '';
+            for (let i = 0; i < 3; i++) {
+                rows += `
+                    <tr>
+                        <td class="p-4"><div class="h-4 w-8 bg-gray-200 rounded skeleton"></div></td>
+                        <td class="p-4"><div class="h-4 w-24 bg-gray-200 rounded skeleton"></div></td>
+                        <td class="p-4"><div class="h-4 w-32 bg-gray-200 rounded skeleton"></div></td>
+                        <td class="p-4"><div class="h-4 w-20 bg-gray-200 rounded skeleton"></div></td>
+                        <td class="p-4"><div class="h-6 w-28 bg-gray-200 rounded-full skeleton"></div></td>
+                        <td class="p-4"><div class="h-4 w-12 bg-gray-200 rounded skeleton"></div></td>
+                    </tr>
+                `;
+            }
+            tbody.innerHTML = rows;
+        }
+
+        // ====== FETCH DATA ======
         async function fetchPengajuan() {
-            console.log("6. Mengambil data pengajuan...");
+            console.log("5. Mengambil data...");
             const tbody = document.getElementById('tableBody');
             
-            // Perbaikan query: gunakan alias 'pengaju' bukan 'users' agar tidak bentrok
             const { data, error } = await supabaseClient
                 .from('pengajuan')
                 .select(`*, pengaju:admin_ksm_id (nama_lengkap, ksm)`)
                 .order('created_at', { ascending: false });
 
             if (error) {
-                console.error("7. Gagal mengambil data pengajuan:", error.message);
+                console.error("6. Error:", error.message);
                 tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-400">Gagal memuat data: ${error.message}</td></tr>`;
                 return;
             }
 
-            console.log("8. Data pengajuan berhasil diambil, jumlah:", data.length);
+            console.log("7. Data diambil:", data.length);
+            allPengajuan = data;
+            
+            updateStatCards();
+            applyTabFilter();
+        }
 
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-400">Belum ada pengajuan.</td></tr>`;
+        // ====== UPDATE STAT CARDS ======
+        function updateStatCards() {
+            const total = allPengajuan.length;
+            const disetujui = allPengajuan.filter(p => p.status === 'disetujui').length;
+            const ditolak = allPengajuan.filter(p => p.status === 'ditolak').length;
+            const tugasSaya = allPengajuan.filter(isMyTask).length;
+            
+            document.getElementById('countTugasSaya').textContent = tugasSaya;
+            document.getElementById('countSemua').textContent = total;
+            document.getElementById('countDisetujui').textContent = disetujui;
+            document.getElementById('countDitolak').textContent = ditolak;
+        }
+
+        // ====== APPLY TAB FILTER ======
+        function applyTabFilter() {
+            let base = [...allPengajuan];
+            
+            if (activeTab === 'tugas-saya') {
+                base = base.filter(isMyTask);
+            } else if (activeTab === 'disetujui') {
+                base = base.filter(p => p.status === 'disetujui');
+            } else if (activeTab === 'ditolak') {
+                base = base.filter(p => p.status === 'ditolak');
+            }
+            // 'semua' → tidak ada filter
+            
+            // Setelah filter tab, jalankan filter form (jika ada)
+            applyFormFilter(base);
+        }
+
+        // ====== APPLY FORM FILTER (dari input user) ======
+        function applyFormFilter(baseData) {
+            const namaObat = document.getElementById('searchObat').value.toLowerCase().trim();
+            const dari = document.getElementById('dariTanggal').value;
+            const sampai = document.getElementById('sampaiTanggal').value;
+            const ksm = document.getElementById('filterKsm').value;
+
+            filteredPengajuan = baseData.filter(item => {
+                if (namaObat && !item.nama_obat.toLowerCase().includes(namaObat)) return false;
+                
+                const tgl = item.tanggal_pengajuan;
+                if (dari && tgl < dari) return false;
+                if (sampai && tgl > sampai) return false;
+                
+                if (ksm && item.pengaju?.ksm !== ksm) return false;
+                
+                return true;
+            });
+            
+            renderTable();
+        }
+
+        // ====== RENDER TABLE ======
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const infoJumlah = document.getElementById('infoJumlah');
+            
+            if (filteredPengajuan.length === 0) {
+                const emptyMsg = activeTab === 'tugas-saya' 
+                    ? '🎉 Tidak ada tugas untuk Anda saat ini. Kerja bagus!'
+                    : 'Tidak ada data yang cocok dengan filter.';
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-400">${emptyMsg}</td></tr>`;
+                infoJumlah.textContent = `Menampilkan 0 data`;
                 return;
             }
 
-            tbody.innerHTML = data.map((item, index) => `
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="p-4">${index + 1}</td>
-                    <td class="p-4">${new Date(item.tanggal_pengajuan).toLocaleDateString('id-ID')}</td>
-                    <td class="p-4 font-medium">${item.nama_obat}</td>
-                    <td class="p-4">${item.pengaju?.ksm || '-'}</td>
-                    <td class="p-4">
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(item.status)}">
-                            ${item.status.replace(/_/g, ' ').toUpperCase()}
-                        </span>
-                    </td>
-                    <td class="p-4">
-                        <button class="text-blue-600 hover:underline text-sm font-medium" onclick="lihatDetail('${item.id}')">Lihat</button>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = filteredPengajuan.map((item, index) => {
+                const highlight = isMyTask(item);
+                const rowClass = highlight 
+                    ? 'bg-yellow-50 border-l-4 border-yellow-400 hover:bg-yellow-100' 
+                    : 'hover:bg-gray-50';
+                
+                return `
+                    <tr class="${rowClass} transition">
+                        <td class="p-4">${index + 1}</td>
+                        <td class="p-4">
+                            <div class="font-medium">${relativeTime(item.tanggal_pengajuan)}</div>
+                            <div class="text-xs text-gray-400">${new Date(item.tanggal_pengajuan).toLocaleDateString('id-ID')}</div>
+                        </td>
+                        <td class="p-4 font-medium">${item.nama_obat}</td>
+                        <td class="p-4">${item.pengaju?.ksm || '-'}</td>
+                        <td class="p-4">${getStatusBadge(item.status)}</td>
+                        <td class="p-4">
+                            <button class="text-rsud hover:underline text-sm font-medium" onclick="lihatDetail('${item.id}')">
+                                ${highlight ? '👉 Proses' : 'Lihat'}
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            const tabLabel = {
+                'tugas-saya': 'Tugas Saya',
+                'semua': 'Semua Pengajuan',
+                'disetujui': 'Disetujui',
+                'ditolak': 'Ditolak'
+            }[activeTab];
+            
+            infoJumlah.textContent = `Menampilkan ${filteredPengajuan.length} data di "${tabLabel}"`;
         }
 
-        function getStatusColor(status) {
-            if (status === 'disetujui') return 'bg-green-100 text-green-700';
-            if (status === 'ditolak') return 'bg-red-100 text-red-700';
-            if (status === 'draft') return 'bg-gray-100 text-gray-700';
-            return 'bg-orange-100 text-orange-700';
+        // ====== TAB SWITCHING ======
+        function switchTab(tabName) {
+            activeTab = tabName;
+            
+            // Update active state kartu
+            document.querySelectorAll('.stat-card').forEach(card => {
+                if (card.dataset.tab === tabName) {
+                    card.classList.add('active');
+                    // Jika tab "tugas-saya", kasih warna hijau
+                    if (tabName === 'tugas-saya') {
+                        card.classList.add('bg-rsud', 'text-white');
+                        card.classList.remove('bg-white', 'text-gray-700');
+                    }
+                } else {
+                    card.classList.remove('active');
+                }
+            });
+            
+            applyTabFilter();
         }
 
-        // Logout
+        // ====== RESET FILTER ======
+        function resetFilter() {
+            document.getElementById('searchObat').value = '';
+            document.getElementById('dariTanggal').value = '';
+            document.getElementById('sampaiTanggal').value = '';
+            document.getElementById('tipePengajuan').value = '';
+            document.getElementById('filterKsm').value = '';
+            
+            applyTabFilter();
+        }
+
+        // ====== EXPORT EXCEL ======
+        function exportExcel() {
+            if (filteredPengajuan.length === 0) {
+                alert('Tidak ada data untuk diekspor.');
+                return;
+            }
+
+            const dataExcel = filteredPengajuan.map((item, index) => ({
+                'No': index + 1,
+                'Tanggal Pengajuan': new Date(item.tanggal_pengajuan).toLocaleDateString('id-ID'),
+                'Nama Obat': item.nama_obat,
+                'KSM': item.pengaju?.ksm || '-',
+                'Pemberi Persetujuan': item.pemberi_persetujuan || '-',
+                'Alasan Pengajuan': item.alasan_pengajuan || '-',
+                'Status': item.status.replace(/_/g, ' ').toUpperCase(),
+                'Tanggal Dibuat': new Date(item.created_at).toLocaleString('id-ID')
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(dataExcel);
+            ws['!cols'] = [
+                { wch: 5 }, { wch: 15 }, { wch: 25 }, { wch: 20 },
+                { wch: 25 }, { wch: 40 }, { wch: 20 }, { wch: 20 }
+            ];
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Pengajuan Obat');
+
+            const today = new Date();
+            const fileName = `pengajuan-obat-${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}.xlsx`;
+            
+            XLSX.writeFile(wb, fileName);
+            console.log('Export berhasil:', fileName);
+        }
+
+        // ====== EVENT LISTENERS ======
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             await supabaseClient.auth.signOut();
             window.location.href = 'index.html';
         });
 
-        // Placeholder Aksi
         document.getElementById('ajukanBtn').addEventListener('click', () => {
             window.location.href = 'pengajuan.html';
         });
-        
+
+        document.getElementById('searchBtn').addEventListener('click', () => applyTabFilter());
+        document.getElementById('resetFilter').addEventListener('click', resetFilter);
+        document.getElementById('exportBtn').addEventListener('click', exportExcel);
+
+        document.getElementById('searchObat').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                applyTabFilter();
+            }
+        });
+
+        // Tab cards
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.addEventListener('click', () => switchTab(card.dataset.tab));
+        });
+
         function lihatDetail(id) {
             window.location.href = 'detail.html?id=' + id;
         }
 
-        // Jalankan saat halaman dimuat
         checkAuth();
     </script>
 </body>
