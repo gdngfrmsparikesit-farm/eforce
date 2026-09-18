@@ -39,6 +39,9 @@
         <!-- Loading State -->
         <div id="loadingState" class="text-center py-12 text-gray-400">Memuat data pengajuan...</div>
 
+        <!-- Error State -->
+        <div id="errorState" class="hidden bg-red-50 border border-red-300 rounded-2xl p-6 text-center text-red-700 text-sm"></div>
+
         <!-- Content -->
         <div id="contentArea" class="hidden space-y-4"></div>
 
@@ -62,59 +65,102 @@
             { key: 5, label: 'Wakil Direktur' }
         ];
 
+        // ====== UTIL: Tampilkan Error ======
+        function showError(msg) {
+            document.getElementById('loadingState').classList.add('hidden');
+            const errEl = document.getElementById('errorState');
+            errEl.textContent = msg;
+            errEl.classList.remove('hidden');
+            console.error('ERROR DETAIL:', msg);
+        }
+
         // ====== LOAD DATA ======
         async function init() {
-            // Parse ID dari URL
-            const params = new URLSearchParams(window.location.search);
-            pengajuanId = params.get('id');
+            try {
+                // Parse ID dari URL
+                const params = new URLSearchParams(window.location.search);
+                pengajuanId = params.get('id');
 
-            if (!pengajuanId) {
-                alert('ID pengajuan tidak ditemukan di URL.');
-                window.location.href = 'dashboard.html';
-                return;
+                if (!pengajuanId) {
+                    alert('ID pengajuan tidak ditemukan di URL.');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+
+                // Cek Auth
+                const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+                if (sessionError || !session) {
+                    console.warn('Sesi tidak ditemukan, redirect ke login.');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                console.log('1. Sesi ditemukan:', session.user.email);
+
+                // Ambil Profil User
+                const { data: profile, error: profileError } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('id', session.user.id)
+                    .maybeSingle();
+
+                if (profileError) {
+                    console.error('2. Error ambil profil:', profileError.message);
+                }
+
+                if (!profile) {
+                    console.error('2. User tidak ditemukan di tabel public.users.');
+                    showError('Akun Anda belum terdaftar di sistem. Hubungi admin untuk mendaftarkan akun Anda di tabel users.');
+                    return;
+                }
+
+                currentUser = profile;
+                console.log('2. Profil ditemukan:', currentUser.nama_lengkap, '- Role:', currentUser.role);
+
+                // Ambil Data Pengajuan
+                const { data: pData, error: pError } = await supabaseClient
+                    .from('pengajuan')
+                    .select('*, pengaju:admin_ksm_id (nama_lengkap, ksm)')
+                    .eq('id', pengajuanId)
+                    .maybeSingle();
+
+                if (pError) {
+                    console.error('3. Error ambil pengajuan:', pError.message);
+                    showError('Gagal memuat pengajuan: ' + pError.message);
+                    return;
+                }
+
+                if (!pData) {
+                    showError('Pengajuan tidak ditemukan.');
+                    return;
+                }
+
+                pengajuan = pData;
+                console.log('3. Pengajuan ditemukan:', pengajuan.nama_obat, '- Step:', pengajuan.current_step);
+
+                // Ambil Riwayat
+                const { data: rData, error: rError } = await supabaseClient
+                    .from('riwayat_pengajuan')
+                    .select('*, user:user_id (nama_lengkap, role)')
+                    .eq('pengajuan_id', pengajuanId)
+                    .order('created_at', { ascending: true });
+
+                if (rError) {
+                    console.warn('4. Gagal ambil riwayat:', rError.message);
+                }
+                riwayat = rData || [];
+                console.log('4. Riwayat ditemukan:', riwayat.length, 'baris');
+
+                // Render
+                renderProgressBar();
+                renderContent();
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('contentArea').classList.remove('hidden');
+
+            } catch (err) {
+                console.error('FATAL ERROR di init():', err);
+                showError('Terjadi kesalahan tak terduga: ' + err.message);
             }
-
-            // Cek Auth
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
-                window.location.href = 'index.html';
-                return;
-            }
-
-            // Ambil Profil User
-            const { data: profile } = await supabaseClient
-                .from('users')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-            currentUser = profile;
-
-            // Ambil Data Pengajuan
-            const { data: pData, error: pError } = await supabaseClient
-                .from('pengajuan')
-                .select('*, pengaju:admin_ksm_id (nama_lengkap, ksm)')
-                .eq('id', pengajuanId)
-                .single();
-
-            if (pError) {
-                alert('Gagal memuat pengajuan: ' + pError.message);
-                window.location.href = 'dashboard.html';
-                return;
-            }
-            pengajuan = pData;
-
-            // Ambil Riwayat
-            const { data: rData } = await supabaseClient
-                .from('riwayat_pengajuan')
-                .select('*, user:user_id (nama_lengkap, role)')
-                .eq('pengajuan_id', pengajuanId)
-                .order('created_at', { ascending: true });
-            riwayat = rData || [];
-
-            renderProgressBar();
-            renderContent();
-            document.getElementById('loadingState').classList.add('hidden');
-            document.getElementById('contentArea').classList.remove('hidden');
         }
 
         // ====== PROGRESS BAR ======
@@ -173,7 +219,7 @@
             const ebmList = pengajuan.ebm_ppk || [];
             if (ebmList.length > 0) {
                 ebmHtml = ebmList.map(e => 
-                    `<div class="flex gap-2 mb-2 text-sm">
+                    `<div class="flex gap-2 mb-2 text-sm items-center">
                         <span class="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs font-medium">${e.tipe}</span>
                         <span class="text-gray-800">${e.nama}</span>
                         ${e.link ? `<a href="${e.link}" target="_blank" class="text-blue-600 hover:underline text-xs">Link</a>` : ''}
@@ -197,9 +243,7 @@
 
         // ====== RENDER FORM STEP 2 (Ketua KSM) ======
         function renderFormKetuaKSM() {
-            return `
-                ${fieldRow('Kriteria Restriksi', pengajuan.kriteria_restriksi)}
-            `;
+            return fieldRow('Kriteria Restriksi', pengajuan.kriteria_restriksi);
         }
 
         // ====== RENDER FORM STEP 3 (Anggota PFT) ======
@@ -223,20 +267,34 @@
         // ====== RENDER RIWAYAT APPROVAL ======
         function renderRiwayatLog() {
             if (riwayat.length === 0) return '<div class="text-gray-400 text-sm">Belum ada riwayat.</div>';
-            return riwayat.map(r => `
-                <div class="flex gap-3 mb-3 pb-3 border-b border-gray-100 last:border-0">
-                    <div class="w-2 h-2 rounded-full ${r.aksi === 'approve' ? 'bg-green-500' : r.aksi === 'reject' ? 'bg-red-500' : 'bg-blue-500'} mt-2"></div>
-                    <div class="flex-1">
-                        <div class="text-sm font-medium text-gray-800">${r.user?.nama_lengkap || 'Unknown'} <span class="text-xs text-gray-500">(${r.role.replace('_', ' ').toUpperCase()})</span></div>
-                        <div class="text-xs text-gray-500 mb-1">${new Date(r.created_at).toLocaleString('id-ID')} • ${r.aksi.toUpperCase()}</div>
-                        ${r.catatan ? `<div class="text-sm text-gray-700 bg-gray-50 rounded px-3 py-2">${r.catatan}</div>` : ''}
+            return riwayat.map(r => {
+                const roleLabel = r.role ? r.role.replace(/_/g, ' ').toUpperCase() : 'UNKNOWN';
+                const aksiLabel = r.aksi ? r.aksi.toUpperCase() : '-';
+                const dotColor = r.aksi === 'approve' ? 'bg-green-500' : r.aksi === 'reject' ? 'bg-red-500' : 'bg-blue-500';
+                return `
+                    <div class="flex gap-3 mb-3 pb-3 border-b border-gray-100 last:border-0">
+                        <div class="w-2 h-2 rounded-full ${dotColor} mt-2 flex-shrink-0"></div>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-800">
+                                ${r.user?.nama_lengkap || 'Unknown'} 
+                                <span class="text-xs text-gray-500">(${roleLabel})</span>
+                            </div>
+                            <div class="text-xs text-gray-500 mb-1">${new Date(r.created_at).toLocaleString('id-ID')} • ${aksiLabel}</div>
+                            ${r.catatan ? `<div class="text-sm text-gray-700 bg-gray-50 rounded px-3 py-2">${r.catatan}</div>` : ''}
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // ====== RENDER HALAMAN ======
         function renderContent() {
+            // GUARD: Pastikan data siap
+            if (!currentUser || !pengajuan) {
+                console.warn('Data belum siap untuk render. currentUser:', !!currentUser, 'pengajuan:', !!pengajuan);
+                return;
+            }
+
             const container = document.getElementById('contentArea');
             const step = pengajuan.current_step;
             const role = currentUser.role;
@@ -263,7 +321,7 @@
                 ${renderRiwayatLog()}
             </div>`;
 
-            // Form Aktif berdasarkan Step dan Role
+            // Cek apakah ini giliran user yang login
             const isMyTurn = (
                 (step === 2 && role === 'ketua_ksm') ||
                 (step === 3 && role === 'anggota_pft') ||
@@ -276,7 +334,6 @@
                     <h2 class="text-xl font-bold text-rsud text-center mb-6">Pengajuan Pengadaan Reguler</h2>
                     <form id="actionForm" class="space-y-5">`;
 
-                // Form sesuai role
                 if (role === 'ketua_ksm') {
                     html += `
                         <div>
@@ -380,7 +437,7 @@
                 html += `</form></div>`;
             } else if (step === 6) {
                 html += `<div class="bg-green-50 border border-green-300 rounded-2xl p-6 text-center text-green-700 font-semibold">✓ Pengajuan ini sudah DISETUJUI sepenuhnya.</div>`;
-            } else if (!isMyTurn) {
+            } else {
                 html += `<div class="bg-yellow-50 border border-yellow-300 rounded-2xl p-6 text-center text-yellow-700 text-sm">Menunggu giliran role lain untuk memproses pengajuan ini.</div>`;
             }
 
@@ -430,6 +487,8 @@
                 catatan = document.getElementById('inputCatatan').value;
             }
 
+            console.log('Mengirim approve:', { p_id: pengajuanId, p_catatan: catatan, kriteria, farmasi });
+
             const { error } = await supabaseClient.rpc('approve_pengajuan', {
                 p_id: pengajuanId,
                 p_catatan: catatan,
@@ -438,6 +497,7 @@
             });
 
             if (error) {
+                console.error('Error approve:', error);
                 errorMsg.textContent = 'Gagal: ' + error.message;
                 errorMsg.classList.remove('hidden');
                 btn.textContent = role === 'anggota_pft' ? 'Submit' : 'Approve';
@@ -474,6 +534,7 @@
             window.location.href = 'index.html';
         });
 
+        // Jalankan saat halaman dimuat
         init();
     </script>
 </body>
