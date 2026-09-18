@@ -17,8 +17,6 @@
         .stat-card { transition: all 0.2s ease; border: 3px solid transparent; }
         .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
         .stat-card.active { border-color: #065f46; transform: translateY(-2px); box-shadow: 0 8px 16px rgba(5,150,105,0.4); }
-        
-        /* Custom scrollbar untuk area tabel */
         #tableScroll::-webkit-scrollbar { width: 8px; }
         #tableScroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         #tableScroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -27,7 +25,6 @@
 </head>
 <body class="bg-gray-50 font-sans h-screen flex flex-col overflow-hidden">
 
-    <!-- HEADER (Fixed) -->
     <header class="bg-white shadow-sm border-b flex-shrink-0 z-20">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-4">
@@ -40,19 +37,15 @@
         </div>
     </header>
 
-    <!-- MAIN (Flex Column) -->
     <main class="flex-1 flex flex-col overflow-hidden">
         
-        <!-- ====== FIXED TOP SECTION ====== -->
         <div class="flex-shrink-0 max-w-7xl mx-auto w-full px-4 pt-5">
-            
             <nav class="text-sm text-gray-500 mb-2">
                 <span class="text-rsud font-medium">🏠 Dashboard</span>
             </nav>
 
             <h1 id="greeting" class="text-xl font-bold text-gray-800 mb-4">Halo, Memuat data...</h1>
 
-            <!-- Stat Cards -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                 <button data-tab="tugas-saya" class="stat-card bg-rsud text-white rounded-xl p-4 text-left active">
                     <div class="flex items-center justify-between mb-1">
@@ -62,40 +55,28 @@
                     <div class="text-2xl font-bold" id="countTugasSaya">-</div>
                     <div class="text-xs opacity-90 mt-1">Tugas Saya</div>
                 </button>
-
                 <button data-tab="semua" class="stat-card bg-white border border-gray-200 text-gray-700 rounded-xl p-4 text-left">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-2xl">📋</span>
-                    </div>
+                    <div class="flex items-center justify-between mb-1"><span class="text-2xl">📋</span></div>
                     <div class="text-2xl font-bold text-gray-800" id="countSemua">-</div>
                     <div class="text-xs text-gray-500 mt-1">Semua Pengajuan</div>
                 </button>
-
                 <button data-tab="disetujui" class="stat-card bg-white border border-gray-200 text-gray-700 rounded-xl p-4 text-left">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-2xl">✅</span>
-                    </div>
+                    <div class="flex items-center justify-between mb-1"><span class="text-2xl">✅</span></div>
                     <div class="text-2xl font-bold text-green-600" id="countDisetujui">-</div>
                     <div class="text-xs text-gray-500 mt-1">Disetujui</div>
                 </button>
-
                 <button data-tab="ditolak" class="stat-card bg-white border border-gray-200 text-gray-700 rounded-xl p-4 text-left">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-2xl">❌</span>
-                    </div>
+                    <div class="flex items-center justify-between mb-1"><span class="text-2xl">❌</span></div>
                     <div class="text-2xl font-bold text-red-600" id="countDitolak">-</div>
                     <div class="text-xs text-gray-500 mt-1">Ditolak</div>
                 </button>
             </div>
 
-            <!-- Filter Box -->
             <div class="bg-rsud rounded-xl p-5 mb-4 shadow-md">
                 <h2 class="text-xl font-bold text-white mb-3">Daftar Pengajuan Obat</h2>
-                
                 <div class="mb-3">
                     <input type="text" id="searchObat" placeholder="🔍 Cari Nama Obat..." class="w-full px-4 py-2 rounded-lg border-none focus:ring-2 focus:ring-emerald-300 outline-none text-sm">
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
                     <div>
                         <label class="block text-xs text-white mb-1">Dari Tanggal</label>
@@ -128,14 +109,12 @@
                         </select>
                     </div>
                 </div>
-
                 <div class="flex justify-end gap-3">
                     <button id="resetFilter" class="text-white text-xs hover:underline">Reset Filter</button>
                     <button id="searchBtn" class="bg-white text-rsud px-5 py-1.5 rounded-lg text-sm font-semibold hover:bg-gray-100 transition">Search</button>
                 </div>
             </div>
 
-            <!-- Action Buttons -->
             <div class="flex justify-between items-center mb-2">
                 <button id="ajukanBtn" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition flex items-center gap-2">
                     <span>+</span> Ajukan Obat Baru
@@ -151,11 +130,8 @@
             </div>
 
             <div id="infoJumlah" class="text-xs text-gray-500 mb-2"></div>
-
         </div>
-        <!-- /END FIXED TOP SECTION -->
 
-        <!-- ====== SCROLLABLE TABLE AREA ====== -->
         <div id="tableScroll" class="flex-1 overflow-y-auto max-w-7xl mx-auto w-full px-4">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <table class="w-full text-left border-collapse">
@@ -173,14 +149,66 @@
                 </table>
             </div>
         </div>
-        <!-- /END SCROLLABLE TABLE -->
 
-        <!-- ====== FIXED PAGINATION ====== -->
         <div class="flex-shrink-0 max-w-7xl mx-auto w-full px-4 pb-4">
             <div id="pagination" class="mt-3"></div>
         </div>
-
     </main>
+
+    <!-- ============ MODAL CETAK ============ -->
+    <div id="printModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+            
+            <div class="p-5 border-b flex justify-between items-center flex-shrink-0">
+                <h3 class="text-lg font-bold text-gray-800">🖨️ Pilih Jenis Cetakan</h3>
+                <button onclick="closePrintModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+            </div>
+            
+            <div class="p-5 overflow-y-auto flex-1">
+                <div class="space-y-3">
+                    <label class="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-emerald-400 transition" id="radioDaftarLabel">
+                        <input type="radio" name="printMode" value="daftar" checked class="mt-1 w-4 h-4" onchange="onPrintModeChange()">
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-800">📋 Cetak Daftar Pengajuan</div>
+                            <div class="text-sm text-gray-500 mt-1">
+                                Cetak tabel daftar semua pengajuan yang sedang tampil 
+                                (<span id="modalCountDaftar" class="font-semibold text-emerald-600">0</span> data)
+                            </div>
+                        </div>
+                    </label>
+                    
+                    <label class="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-emerald-400 transition" id="radioFormLabel">
+                        <input type="radio" name="printMode" value="form" class="mt-1 w-4 h-4" onchange="onPrintModeChange()">
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-800">📄 Cetak Form Pengajuan</div>
+                            <div class="text-sm text-gray-500 mt-1">Pilih pengajuan yang ingin dicetak formulir lengkapnya</div>
+                        </div>
+                    </label>
+                </div>
+                
+                <!-- Checkbox list (muncul saat pilih form) -->
+                <div id="modalFormList" class="hidden mt-4 border-t pt-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-sm font-medium text-gray-700">Pilih Pengajuan:</span>
+                        <div class="flex gap-3">
+                            <button onclick="selectAllForm(true)" class="text-xs text-emerald-600 hover:underline font-medium">Pilih Semua</button>
+                            <button onclick="selectAllForm(false)" class="text-xs text-gray-500 hover:underline font-medium">Kosongkan</button>
+                        </div>
+                    </div>
+                    <div id="modalCheckboxList" class="space-y-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50"></div>
+                    <div class="mt-2 text-xs text-gray-500">
+                        <span id="modalCountSelected">0</span> pengajuan dipilih
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-4 border-t flex justify-end gap-2 flex-shrink-0 bg-gray-50 rounded-b-2xl">
+                <button onclick="closePrintModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-white transition font-medium">Batal</button>
+                <button onclick="doPrint()" class="px-6 py-2 bg-rsud text-white rounded-lg font-semibold hover:bg-emerald-700 transition">🖨️ Cetak Sekarang</button>
+            </div>
+        </div>
+    </div>
+    <!-- ============ /MODAL CETAK ============ -->
 
     <script>
         const SUPABASE_URL = 'https://liyjnpjawjkobopwuhnb.supabase.co';
@@ -194,7 +222,6 @@
         let currentPage = 1;
         const PER_PAGE = 10;
 
-        // ====== UTIL: Relative Time ======
         function relativeTime(dateStr) {
             const date = new Date(dateStr);
             const now = new Date();
@@ -209,7 +236,6 @@
             return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
         }
 
-        // ====== UTIL: Status Badge ======
         function getStatusBadge(status) {
             const map = {
                 'draft':                { label: 'Draft', icon: '📝', cls: 'bg-gray-100 text-gray-700' },
@@ -226,7 +252,6 @@
             </span>`;
         }
 
-        // ====== UTIL: Cek Tugas User ======
         function isMyTask(item) {
             if (!currentUser) return false;
             const role = currentUser.role;
@@ -243,18 +268,10 @@
             return status === taskMap[role];
         }
 
-        // ====== CEK AUTH ======
         async function checkAuth() {
             const { data: { session }, error } = await supabaseClient.auth.getSession();
-            if (error || !session) {
-                window.location.href = 'index.html';
-                return;
-            }
-            const { data: profile } = await supabaseClient
-                .from('users')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
+            if (error || !session) { window.location.href = 'index.html'; return; }
+            const { data: profile } = await supabaseClient.from('users').select('*').eq('id', session.user.id).single();
             if (profile) {
                 currentUser = profile;
                 document.getElementById('greeting').textContent = `Halo, ${profile.nama_lengkap} (${profile.role.replace(/_/g, ' ').toUpperCase()})`;
@@ -266,7 +283,6 @@
             fetchPengajuan();
         }
 
-        // ====== SKELETON ======
         function renderSkeleton() {
             const tbody = document.getElementById('tableBody');
             let rows = '';
@@ -283,14 +299,12 @@
             tbody.innerHTML = rows;
         }
 
-        // ====== FETCH DATA ======
         async function fetchPengajuan() {
             const tbody = document.getElementById('tableBody');
             const { data, error } = await supabaseClient
                 .from('pengajuan')
                 .select(`*, pengaju:admin_ksm_id (nama_lengkap, ksm)`)
                 .order('created_at', { ascending: false });
-
             if (error) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-400">Gagal memuat data: ${error.message}</td></tr>`;
                 return;
@@ -311,7 +325,6 @@
             document.getElementById('countDitolak').textContent = ditolak;
         }
 
-        // ====== FILTER TAB ======
         function applyTabFilter() {
             let base = [...allPengajuan];
             if (activeTab === 'tugas-saya') base = base.filter(isMyTask);
@@ -320,13 +333,11 @@
             applyFormFilter(base);
         }
 
-        // ====== FILTER FORM ======
         function applyFormFilter(baseData) {
             const namaObat = document.getElementById('searchObat').value.toLowerCase().trim();
             const dari = document.getElementById('dariTanggal').value;
             const sampai = document.getElementById('sampaiTanggal').value;
             const ksm = document.getElementById('filterKsm').value;
-
             filteredPengajuan = baseData.filter(item => {
                 if (namaObat && !item.nama_obat.toLowerCase().includes(namaObat)) return false;
                 const tgl = item.tanggal_pengajuan;
@@ -335,17 +346,13 @@
                 if (ksm && item.pengaju?.ksm !== ksm) return false;
                 return true;
             });
-            
-            // Reset ke halaman 1 setiap kali filter berubah
             currentPage = 1;
             renderTable();
         }
 
-        // ====== RENDER TABLE (dengan pagination) ======
         function renderTable() {
             const tbody = document.getElementById('tableBody');
             const infoJumlah = document.getElementById('infoJumlah');
-            
             if (filteredPengajuan.length === 0) {
                 const emptyMsg = activeTab === 'tugas-saya' 
                     ? '🎉 Tidak ada tugas untuk Anda saat ini. Kerja bagus!'
@@ -355,11 +362,9 @@
                 document.getElementById('pagination').innerHTML = '';
                 return;
             }
-
             const totalPages = Math.ceil(filteredPengajuan.length / PER_PAGE);
             if (currentPage > totalPages) currentPage = totalPages;
             if (currentPage < 1) currentPage = 1;
-            
             const startIdx = (currentPage - 1) * PER_PAGE;
             const endIdx = startIdx + PER_PAGE;
             const pageData = filteredPengajuan.slice(startIdx, endIdx);
@@ -386,69 +391,41 @@
                     </tr>
                 `;
             }).join('');
-            
             const tabLabel = { 'tugas-saya': 'Tugas Saya', 'semua': 'Semua Pengajuan', 'disetujui': 'Disetujui', 'ditolak': 'Ditolak' }[activeTab];
             infoJumlah.textContent = `Menampilkan ${startIdx + 1}-${Math.min(endIdx, filteredPengajuan.length)} dari ${filteredPengajuan.length} data di "${tabLabel}"`;
-            
             renderPagination(totalPages);
         }
 
-        // ====== RENDER PAGINATION ======
         function renderPagination(totalPages) {
             const container = document.getElementById('pagination');
-            if (totalPages <= 1) {
-                container.innerHTML = '';
-                return;
-            }
-            
+            if (totalPages <= 1) { container.innerHTML = ''; return; }
             let html = '<div class="flex items-center justify-center gap-1 flex-wrap">';
-            
-            // Prev
             const prevDisabled = currentPage === 1;
-            html += `<button onclick="goToPage(${currentPage - 1})" ${prevDisabled ? 'disabled' : ''} 
-                class="px-3 py-1.5 rounded-lg text-sm font-medium border ${prevDisabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'}">
-                ‹ Prev
-            </button>`;
-            
-            // Page numbers (dengan ellipsis jika banyak)
+            html += `<button onclick="goToPage(${currentPage - 1})" ${prevDisabled ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg text-sm font-medium border ${prevDisabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'}">‹ Prev</button>`;
             for (let i = 1; i <= totalPages; i++) {
                 if (totalPages > 7) {
                     if (i !== 1 && i !== totalPages && Math.abs(i - currentPage) > 1) {
-                        if (i === 2 || i === totalPages - 1) {
-                            html += `<span class="px-2 text-gray-400">...</span>`;
-                        }
+                        if (i === 2 || i === totalPages - 1) html += `<span class="px-2 text-gray-400">...</span>`;
                         continue;
                     }
                 }
                 const active = i === currentPage;
-                html += `<button onclick="goToPage(${i})" 
-                    class="px-3 py-1.5 rounded-lg text-sm font-medium border ${active ? 'bg-rsud text-white border-rsud' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'}">
-                    ${i}
-                </button>`;
+                html += `<button onclick="goToPage(${i})" class="px-3 py-1.5 rounded-lg text-sm font-medium border ${active ? 'bg-rsud text-white border-rsud' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'}">${i}</button>`;
             }
-            
-            // Next
             const nextDisabled = currentPage === totalPages;
-            html += `<button onclick="goToPage(${currentPage + 1})" ${nextDisabled ? 'disabled' : ''} 
-                class="px-3 py-1.5 rounded-lg text-sm font-medium border ${nextDisabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'}">
-                Next ›
-            </button>`;
-            
+            html += `<button onclick="goToPage(${currentPage + 1})" ${nextDisabled ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg text-sm font-medium border ${nextDisabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'}">Next ›</button>`;
             html += '</div>';
             container.innerHTML = html;
         }
 
-        // ====== GO TO PAGE ======
         function goToPage(page) {
             const totalPages = Math.ceil(filteredPengajuan.length / PER_PAGE);
             if (page < 1 || page > totalPages) return;
             currentPage = page;
             renderTable();
-            // Scroll tabel ke atas
             document.getElementById('tableScroll').scrollTop = 0;
         }
 
-        // ====== SWITCH TAB ======
         function switchTab(tabName) {
             activeTab = tabName;
             currentPage = 1;
@@ -459,14 +436,11 @@
                         card.classList.add('bg-rsud', 'text-white');
                         card.classList.remove('bg-white', 'text-gray-700');
                     }
-                } else {
-                    card.classList.remove('active');
-                }
+                } else { card.classList.remove('active'); }
             });
             applyTabFilter();
         }
 
-        // ====== RESET FILTER ======
         function resetFilter() {
             document.getElementById('searchObat').value = '';
             document.getElementById('dariTanggal').value = '';
@@ -477,12 +451,8 @@
             applyTabFilter();
         }
 
-        // ====== EXPORT EXCEL (semua hasil filter, bukan hanya halaman aktif) ======
         function exportExcel() {
-            if (filteredPengajuan.length === 0) {
-                alert('Tidak ada data untuk diekspor.');
-                return;
-            }
+            if (filteredPengajuan.length === 0) { alert('Tidak ada data untuk diekspor.'); return; }
             const dataExcel = filteredPengajuan.map((item, index) => ({
                 'No': index + 1,
                 'Tanggal Pengajuan': new Date(item.tanggal_pengajuan).toLocaleDateString('id-ID'),
@@ -502,20 +472,90 @@
             XLSX.writeFile(wb, fileName);
         }
 
-        // ====== PRINT PDF ======
-        function printPengajuan() {
+        // ============ PRINT MODAL ============
+        function openPrintModal() {
             if (filteredPengajuan.length === 0) {
                 alert('Tidak ada data untuk dicetak.');
                 return;
             }
-            if (filteredPengajuan.length > 1) {
-                const pilihan = confirm(`Ada ${filteredPengajuan.length} data. Cetak data pertama (${filteredPengajuan[0].nama_obat})?`);
-                if (!pilihan) return;
-            }
-            window.open('cetak.html?id=' + filteredPengajuan[0].id, '_blank');
+            document.getElementById('modalCountDaftar').textContent = filteredPengajuan.length;
+            document.getElementById('printModal').classList.remove('hidden');
+            // Reset radio ke "daftar"
+            document.querySelector('input[name="printMode"][value="daftar"]').checked = true;
+            onPrintModeChange();
         }
 
-        // ====== EVENT LISTENERS ======
+        function closePrintModal() {
+            document.getElementById('printModal').classList.add('hidden');
+        }
+
+        function onPrintModeChange() {
+            const mode = document.querySelector('input[name="printMode"]:checked').value;
+            const formList = document.getElementById('modalFormList');
+            
+            // Update visual border
+            document.getElementById('radioDaftarLabel').className = 
+                mode === 'daftar' 
+                    ? 'flex items-start gap-3 p-4 border-2 border-emerald-500 bg-emerald-50 rounded-lg cursor-pointer transition'
+                    : 'flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-emerald-400 transition';
+            document.getElementById('radioFormLabel').className = 
+                mode === 'form'
+                    ? 'flex items-start gap-3 p-4 border-2 border-emerald-500 bg-emerald-50 rounded-lg cursor-pointer transition'
+                    : 'flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-emerald-400 transition';
+            
+            if (mode === 'form') {
+                formList.classList.remove('hidden');
+                renderCheckboxList();
+            } else {
+                formList.classList.add('hidden');
+            }
+        }
+
+        function renderCheckboxList() {
+            const container = document.getElementById('modalCheckboxList');
+            container.innerHTML = filteredPengajuan.map((item, idx) => `
+                <label class="flex items-center gap-3 p-2 hover:bg-white rounded cursor-pointer transition">
+                    <input type="checkbox" class="modal-checkbox w-4 h-4" value="${item.id}" onchange="updateSelectedCount()">
+                    <div class="flex-1 text-sm">
+                        <div class="font-medium text-gray-800">${item.nama_obat}</div>
+                        <div class="text-xs text-gray-500">${new Date(item.tanggal_pengajuan).toLocaleDateString('id-ID')} • ${item.pengaju?.ksm || '-'}</div>
+                    </div>
+                </label>
+            `).join('');
+            updateSelectedCount();
+        }
+
+        function selectAllForm(checked) {
+            document.querySelectorAll('.modal-checkbox').forEach(cb => { cb.checked = checked; });
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const count = document.querySelectorAll('.modal-checkbox:checked').length;
+            document.getElementById('modalCountSelected').textContent = count;
+        }
+
+        function doPrint() {
+            const mode = document.querySelector('input[name="printMode"]:checked').value;
+            
+            let ids = [];
+            if (mode === 'daftar') {
+                ids = filteredPengajuan.map(p => p.id);
+            } else {
+                ids = Array.from(document.querySelectorAll('.modal-checkbox:checked')).map(cb => cb.value);
+                if (ids.length === 0) {
+                    alert('Pilih minimal 1 pengajuan untuk dicetak.');
+                    return;
+                }
+            }
+
+            const idsParam = ids.join(',');
+            const url = `cetak.html?mode=${mode}&ids=${encodeURIComponent(idsParam)}`;
+            window.open(url, '_blank');
+            closePrintModal();
+        }
+
+        // ============ EVENT LISTENERS ============
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             await supabaseClient.auth.signOut();
             window.location.href = 'index.html';
@@ -524,12 +564,16 @@
         document.getElementById('searchBtn').addEventListener('click', () => { currentPage = 1; applyTabFilter(); });
         document.getElementById('resetFilter').addEventListener('click', resetFilter);
         document.getElementById('exportBtn').addEventListener('click', exportExcel);
-        document.getElementById('printBtn').addEventListener('click', printPengajuan);
+        document.getElementById('printBtn').addEventListener('click', openPrintModal);
         document.getElementById('searchObat').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') { e.preventDefault(); currentPage = 1; applyTabFilter(); }
         });
         document.querySelectorAll('.stat-card').forEach(card => {
             card.addEventListener('click', () => switchTab(card.dataset.tab));
+        });
+        // Tutup modal jika klik area luar
+        document.getElementById('printModal').addEventListener('click', (e) => {
+            if (e.target.id === 'printModal') closePrintModal();
         });
 
         function lihatDetail(id) {
