@@ -541,12 +541,12 @@
             // === KIRIM EMAIL REJECT (opsional) ===
             try {
                 if (typeof sendEmailNotif === 'function') {
-                    const stepBefore = {
-                        2: 'admin_ksm',
-                        3: 'ketua_ksm',
-                        4: 'anggota_pft',
-                        5: 'ketua_pft'
-                    };
+                   const stepBefore = {
+                2: 'admin_ksm',
+                3: 'ketua_ksm',
+                4: 'ketua_ksm',  // ← Ketua PFT reject → Ketua KSM
+                5: 'ketua_pft'
+            };
                     const targetRole = stepBefore[pengajuan.current_step];
                     
                     if (targetRole) {
