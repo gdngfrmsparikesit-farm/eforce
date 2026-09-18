@@ -4,7 +4,7 @@
 // ============================================
 
 // ⚠️ GANTI 3 VARIABEL INI DENGAN MILIK ANDA (dari dashboard EmailJS)
-const EMAILJS_PUBLIC_KEY = 'GANTI_DENGAN_PUBLIC_KEY_ANDA';
+const EMAILJS_PUBLIC_KEY = 'AYo9frQiraJTIa3et';
 const EMAILJS_SERVICE_ID = 'GANTI_DENGAN_SERVICE_ID_ANDA';
 const EMAILJS_TEMPLATE_ID = 'GANTI_DENGAN_TEMPLATE_ID_ANDA';
 
