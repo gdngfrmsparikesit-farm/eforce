@@ -39,7 +39,6 @@
             <span>‹</span> Kembali
         </a>
 
-        <!-- Progress Bar (Disembunyikan teksnya di HP) -->
         <div class="flex items-center justify-between mb-6 md:mb-8 px-1 md:px-4">
             <div class="flex flex-col items-center flex-1">
                 <div class="w-8 h-8 md:w-12 md:h-12 text-sm md:text-base rounded-full border-2 flex items-center justify-center font-bold step-active">1</div>
@@ -118,7 +117,126 @@
         </div>
     </main>
 
-    <!-- (Salin seluruh isi script Javascript dari file pengajuan.html Anda yang sebelumnya ke sini, TIDAK ADA yang perlu diubah pada logikanya) -->
+    <script src="emailHelper.js"></script>
+    <script>
+        const SUPABASE_URL = 'https://liyjnpjawjkobopwuhnb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpeWpucGphd2prb2JvcHd1aG5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2Mjk5MTMsImV4cCI6MjEwNTIwNTkxM30.xAZRyHQQf2c1jYOIlcUpy_XnwScwSdg6bs8on7_t1Nw';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        let currentUserProfile = null;
+
+        async function checkAuth() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                window.location.href = 'index.html';
+                return;
+            }
+            const { data: profile } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+            currentUserProfile = profile;
+            document.getElementById('tanggalPengajuan').valueAsDate = new Date();
+            tambahBarisEbm();
+        }
+
+        function tambahBarisEbm() {
+            const container = document.getElementById('ebmContainer');
+            const row = document.createElement('div');
+            row.className = 'ebm-row flex flex-col md:flex-row gap-2 items-stretch md:items-center';
+            row.innerHTML = `
+                <select class="ebm-tipe px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none w-full md:w-32">
+                    <option value="EBM">EBM</option>
+                    <option value="PPK">PPK</option>
+                    <option value="Konsensus">Konsensus</option>
+                </select>
+                <input type="text" class="ebm-nama flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Nama (contoh: EBM Vita)">
+                <input type="text" class="ebm-link flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Link (contoh: https://...)">
+                <button type="button" class="hapus-ebm text-red-500 hover:text-red-700 px-2 text-xl font-bold self-end md:self-auto" title="Hapus">🗑</button>
+            `;
+            row.querySelector('.hapus-ebm').addEventListener('click', () => {
+                if (container.querySelectorAll('.ebm-row').length > 1) row.remove();
+                else alert('Minimal harus ada 1 baris EBM/PPK.');
+            });
+            container.appendChild(row);
+        }
+
+        document.getElementById('tambahEbmBtn').addEventListener('click', tambahBarisEbm);
+
+        document.getElementById('pengajuanForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const errorMsg = document.getElementById('errorMsg');
+            
+            btn.textContent = 'Mengirim...';
+            btn.disabled = true;
+            errorMsg.classList.add('hidden');
+
+            const ebmRows = document.querySelectorAll('.ebm-row');
+            const ebmData = [];
+            ebmRows.forEach(row => {
+                const tipe = row.querySelector('.ebm-tipe').value;
+                const nama = row.querySelector('.ebm-nama').value.trim();
+                const link = row.querySelector('.ebm-link').value.trim();
+                if (nama) ebmData.push({ tipe, nama, link });
+            });
+
+            if (ebmData.length === 0) {
+                errorMsg.textContent = 'Minimal isi 1 nama EBM/PPK/Konsensus.';
+                errorMsg.classList.remove('hidden');
+                btn.textContent = 'Submit';
+                btn.disabled = false;
+                return;
+            }
+
+            const payload = {
+                p_tanggal: document.getElementById('tanggalPengajuan').value,
+                p_nama_obat: document.getElementById('namaObat').value,
+                p_ebm_ppk: ebmData,
+                p_alasan: document.getElementById('alasanPengajuan').value,
+                p_pemberi_persetujuan: document.getElementById('pemberiPersetujuan').value
+            };
+
+            const { data, error } = await supabaseClient.rpc('submit_pengajuan', payload);
+
+            if (error) {
+                errorMsg.textContent = 'Gagal submit: ' + error.message;
+                errorMsg.classList.remove('hidden');
+                btn.textContent = 'Submit';
+                btn.disabled = false;
+                return;
+            }
+
+            alert('Pengajuan berhasil dikirim!');
+            
+            try {
+                if (typeof sendEmailNotif === 'function') {
+                    await sendEmailNotif(
+                        'ketua_ksm',
+                        {
+                            id: data,
+                            nama_obat: payload.p_nama_obat,
+                            pengaju: currentUserProfile
+                        },
+                        'Menunggu Persetujuan',
+                        'Pengajuan baru menunggu review Anda',
+                        supabaseClient
+                    );
+                }
+            } catch (emailErr) {
+                console.error('Email gagal:', emailErr);
+            }
+            
+            window.location.href = 'dashboard.html';
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await supabaseClient.auth.signOut();
+            window.location.href = 'index.html';
+        });
+
+        checkAuth();
+    </script>
 </body>
 </html>
