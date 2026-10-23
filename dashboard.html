@@ -15,12 +15,25 @@
         .stat-card { transition: all 0.2s ease; border: 3px solid transparent; }
         .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
         .stat-card.active { border-color: #065f46; transform: translateY(-2px); box-shadow: 0 8px 16px rgba(5,150,105,0.4); }
+        
+        /* Custom scrollbar hanya untuk desktop */
+        @media (min-width: 768px) {
+            #tableScroll::-webkit-scrollbar { width: 8px; }
+            #tableScroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+            #tableScroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+            #tableScroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        }
     </style>
 </head>
-<body class="bg-gray-50 font-sans h-screen flex flex-col overflow-hidden">
+<!-- 
+    PERUBAHAN PENTING DI SINI:
+    Di HP: scroll normal (min-h-screen flex flex-col).
+    Di Desktop (md): dikunci tingginya (md:h-screen md:overflow-hidden) agar hanya tabel yang scroll.
+-->
+<body class="bg-gray-50 font-sans min-h-screen flex flex-col md:h-screen md:overflow-hidden">
 
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b flex-shrink-0 z-20">
+    <header class="bg-white shadow-sm border-b sticky top-0 z-20 flex-shrink-0">
         <div class="w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 py-3 flex justify-between items-center">
             <div class="h-10 w-32 bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs font-semibold">RSUD AMP</div>
             <div class="flex items-center gap-2 md:gap-3">
@@ -30,9 +43,10 @@
         </div>
     </header>
 
-    <main class="flex-1 flex flex-col overflow-hidden">
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col md:overflow-hidden">
         
-        <!-- Bagian Atas (Fixed) -->
+        <!-- Bagian Atas (Filter, Stat, Tombol) -->
         <div class="flex-shrink-0 w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 pt-4 md:pt-5">
             <nav class="text-sm text-gray-500 mb-2">
                 <span class="text-rsud font-medium">🏠 Dashboard</span>
@@ -129,8 +143,8 @@
             <div id="infoJumlah" class="text-xs text-gray-500 mb-2"></div>
         </div>
 
-        <!-- Tabel (Scrollable) -->
-        <div id="tableScroll" class="flex-1 overflow-y-auto w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 pb-2">
+        <!-- Area Tabel (Bisa di-scroll vertikal di Desktop, dan horizontal di HP) -->
+        <div id="tableScroll" class="w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 pb-2 md:flex-1 md:overflow-y-auto">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
                 <table class="w-full text-left border-collapse min-w-[700px]">
                     <thead class="sticky top-0 z-10 bg-gray-50 shadow-sm">
@@ -148,9 +162,11 @@
             </div>
         </div>
 
-        <div class="flex-shrink-0 w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 pb-4">
+        <!-- Pagination -->
+        <div class="w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 pb-4 flex-shrink-0">
             <div id="pagination" class="mt-3"></div>
         </div>
+
     </main>
 
     <!-- Modal Print -->
@@ -233,7 +249,7 @@
                 'ditolak':              { label: 'Ditolak', icon: '❌', cls: 'bg-red-100 text-red-700' }
             };
             const item = map[status] || { label: status, icon: '•', cls: 'bg-gray-100 text-gray-700' };
-            return `<span class="px-2.5 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1 ${item.cls}">
+            return `<span class="px-2.5 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1 ${item.cls} whitespace-nowrap">
                 <span>${item.icon}</span> ${item.label}
             </span>`;
         }
@@ -364,14 +380,14 @@
                     <tr class="${rowClass} transition">
                         <td class="p-3">${globalIdx + 1}</td>
                         <td class="p-3">
-                            <div class="font-medium">${relativeTime(item.tanggal_pengajuan)}</div>
-                            <div class="text-xs text-gray-400">${new Date(item.tanggal_pengajuan).toLocaleDateString('id-ID')}</div>
+                            <div class="font-medium whitespace-nowrap">${relativeTime(item.tanggal_pengajuan)}</div>
+                            <div class="text-xs text-gray-400 whitespace-nowrap">${new Date(item.tanggal_pengajuan).toLocaleDateString('id-ID')}</div>
                         </td>
                         <td class="p-3 font-medium">${item.nama_obat}</td>
-                        <td class="p-3">${item.pengaju?.ksm || '-'}</td>
+                        <td class="p-3 whitespace-nowrap">${item.pengaju?.ksm || '-'}</td>
                         <td class="p-3">${getStatusBadge(item.status)}</td>
                         <td class="p-3">
-                            <button class="text-rsud hover:underline text-sm font-medium" onclick="lihatDetail('${item.id}')">
+                            <button class="text-rsud hover:underline text-sm font-medium whitespace-nowrap" onclick="lihatDetail('${item.id}')">
                                 ${highlight ? '👉 Proses' : 'Lihat'}
                             </button>
                         </td>
@@ -410,7 +426,9 @@
             if (page < 1 || page > totalPages) return;
             currentPage = page;
             renderTable();
-            document.getElementById('tableScroll').scrollTop = 0;
+            if (window.innerWidth >= 768) {
+                document.getElementById('tableScroll').scrollTop = 0;
+            }
         }
 
         function switchTab(tabName) {
