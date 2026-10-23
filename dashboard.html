@@ -10,7 +10,6 @@
     <style>
         .bg-rsud { background-color: #059669; }
         .text-rsud { color: #059669; }
-        .border-rsud { border-color: #059669; }
         @keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .skeleton { animation: pulse-slow 1.5s ease-in-out infinite; }
         .stat-card { transition: all 0.2s ease; border: 3px solid transparent; }
@@ -20,6 +19,7 @@
 </head>
 <body class="bg-gray-50 font-sans h-screen flex flex-col overflow-hidden">
 
+    <!-- Header -->
     <header class="bg-white shadow-sm border-b flex-shrink-0 z-20">
         <div class="w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 py-3 flex justify-between items-center">
             <div class="h-10 w-32 bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs font-semibold">RSUD AMP</div>
@@ -32,6 +32,7 @@
 
     <main class="flex-1 flex flex-col overflow-hidden">
         
+        <!-- Bagian Atas (Fixed) -->
         <div class="flex-shrink-0 w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 pt-4 md:pt-5">
             <nav class="text-sm text-gray-500 mb-2">
                 <span class="text-rsud font-medium">🏠 Dashboard</span>
@@ -72,7 +73,6 @@
                 <div class="mb-3">
                     <input type="text" id="searchObat" placeholder="🔍 Cari Nama Obat..." class="w-full px-4 py-2 rounded-lg border-none focus:ring-2 focus:ring-emerald-300 outline-none text-sm">
                 </div>
-                <!-- Grid 1 di HP, 2 di Tablet, 4 di Desktop -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
                     <div>
                         <label class="block text-xs text-white mb-1">Dari Tanggal</label>
@@ -111,7 +111,7 @@
                 </div>
             </div>
 
-            <!-- Tombol Aksi (Menumpuk di HP) -->
+            <!-- Tombol Aksi -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-2">
                 <button id="ajukanBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition flex justify-center items-center gap-2">
                     <span>+</span> Ajukan Obat Baru
@@ -129,7 +129,7 @@
             <div id="infoJumlah" class="text-xs text-gray-500 mb-2"></div>
         </div>
 
-        <!-- Area Tabel (Bisa di-scroll horizontal di HP) -->
+        <!-- Tabel (Scrollable) -->
         <div id="tableScroll" class="flex-1 overflow-y-auto w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 pb-2">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
                 <table class="w-full text-left border-collapse min-w-[700px]">
@@ -153,8 +153,383 @@
         </div>
     </main>
 
-    <!-- ... SISA KODE JAVASCRIPT TETAP SAMA SEPERTI SEBELUMNYA ... -->
-    <!-- (Salin script Javascript dari file dashboard.html Anda yang sebelumnya ke sini) -->
-    
+    <!-- Modal Print -->
+    <div id="printModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+            <div class="p-5 border-b flex justify-between items-center flex-shrink-0">
+                <h3 class="text-lg font-bold text-gray-800">🖨️ Pilih Jenis Cetakan</h3>
+                <button onclick="closePrintModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+            </div>
+            <div class="p-5 overflow-y-auto flex-1">
+                <div class="space-y-3">
+                    <label class="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-emerald-400 transition" id="radioDaftarLabel">
+                        <input type="radio" name="printMode" value="daftar" checked class="mt-1 w-4 h-4" onchange="onPrintModeChange()">
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-800">📋 Cetak Daftar Pengajuan</div>
+                            <div class="text-sm text-gray-500 mt-1">Cetak tabel daftar semua pengajuan yang sedang tampil (<span id="modalCountDaftar" class="font-semibold text-emerald-600">0</span> data)</div>
+                        </div>
+                    </label>
+                    <label class="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-emerald-400 transition" id="radioFormLabel">
+                        <input type="radio" name="printMode" value="form" class="mt-1 w-4 h-4" onchange="onPrintModeChange()">
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-800">📄 Cetak Form Pengajuan</div>
+                            <div class="text-sm text-gray-500 mt-1">Pilih pengajuan yang ingin dicetak formulir lengkapnya</div>
+                        </div>
+                    </label>
+                </div>
+                <div id="modalFormList" class="hidden mt-4 border-t pt-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-sm font-medium text-gray-700">Pilih Pengajuan:</span>
+                        <div class="flex gap-3">
+                            <button onclick="selectAllForm(true)" class="text-xs text-emerald-600 hover:underline font-medium">Pilih Semua</button>
+                            <button onclick="selectAllForm(false)" class="text-xs text-gray-500 hover:underline font-medium">Kosongkan</button>
+                        </div>
+                    </div>
+                    <div id="modalCheckboxList" class="space-y-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50"></div>
+                    <div class="mt-2 text-xs text-gray-500"><span id="modalCountSelected">0</span> pengajuan dipilih</div>
+                </div>
+            </div>
+            <div class="p-4 border-t flex justify-end gap-2 flex-shrink-0 bg-gray-50 rounded-b-2xl">
+                <button onclick="closePrintModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-white transition font-medium">Batal</button>
+                <button onclick="doPrint()" class="px-6 py-2 bg-rsud text-white rounded-lg font-semibold hover:bg-emerald-700 transition">🖨️ Cetak Sekarang</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://liyjnpjawjkobopwuhnb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpeWpucGphd2prb2JvcHd1aG5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2Mjk5MTMsImV4cCI6MjEwNTIwNTkxM30.xAZRyHQQf2c1jYOIlcUpy_XnwScwSdg6bs8on7_t1Nw';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;
+        let allPengajuan = [];
+        let filteredPengajuan = [];
+        let activeTab = 'tugas-saya';
+        let currentPage = 1;
+        const PER_PAGE = 10;
+
+        function relativeTime(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffSec = Math.floor((now - date) / 1000);
+            const diffMin = Math.floor(diffSec / 60);
+            const diffHour = Math.floor(diffMin / 60);
+            const diffDay = Math.floor(diffHour / 24);
+            if (diffSec < 60) return 'baru saja';
+            if (diffMin < 60) return `${diffMin} menit lalu`;
+            if (diffHour < 24) return `${diffHour} jam lalu`;
+            if (diffDay < 7) return `${diffDay} hari lalu`;
+            return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function getStatusBadge(status) {
+            const map = {
+                'draft':                { label: 'Draft', icon: '📝', cls: 'bg-gray-100 text-gray-700' },
+                'menunggu_ketua_ksm':   { label: 'Menunggu Ketua KSM', icon: '⏳', cls: 'bg-yellow-100 text-yellow-700' },
+                'menunggu_anggota_pft': { label: 'Menunggu Anggota PFT', icon: '⏳', cls: 'bg-yellow-100 text-yellow-700' },
+                'menunggu_ketua_pft':   { label: 'Menunggu Ketua PFT', icon: '⏳', cls: 'bg-yellow-100 text-yellow-700' },
+                'menunggu_wadir':       { label: 'Menunggu Wadir', icon: '⏳', cls: 'bg-yellow-100 text-yellow-700' },
+                'disetujui':            { label: 'Disetujui', icon: '✅', cls: 'bg-green-100 text-green-700' },
+                'ditolak':              { label: 'Ditolak', icon: '❌', cls: 'bg-red-100 text-red-700' }
+            };
+            const item = map[status] || { label: status, icon: '•', cls: 'bg-gray-100 text-gray-700' };
+            return `<span class="px-2.5 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1 ${item.cls}">
+                <span>${item.icon}</span> ${item.label}
+            </span>`;
+        }
+
+        function isMyTask(item) {
+            if (!currentUser) return false;
+            const role = currentUser.role;
+            const status = item.status;
+            const taskMap = {
+                'ketua_ksm':   'menunggu_ketua_ksm',
+                'anggota_pft': 'menunggu_anggota_pft',
+                'ketua_pft':   'menunggu_ketua_pft',
+                'wadir':       'menunggu_wadir'
+            };
+            if (role === 'admin_ksm') {
+                return item.admin_ksm_id === currentUser.id && !['disetujui', 'ditolak'].includes(status);
+            }
+            return status === taskMap[role];
+        }
+
+        async function checkAuth() {
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            if (error || !session) { window.location.href = 'index.html'; return; }
+            
+            const { data: profile } = await supabaseClient.from('users').select('*').eq('id', session.user.id).single();
+            if (profile) {
+                currentUser = profile;
+                document.getElementById('greeting').textContent = `Halo, ${profile.nama_lengkap} (${profile.role.replace(/_/g, ' ').toUpperCase()})`;
+                if (profile.role !== 'admin_ksm') {
+                    document.getElementById('ajukanBtn').style.display = 'none';
+                }
+            }
+            renderSkeleton();
+            fetchPengajuan();
+        }
+
+        function renderSkeleton() {
+            const tbody = document.getElementById('tableBody');
+            let rows = '';
+            for (let i = 0; i < 5; i++) {
+                rows += `<tr>
+                    <td class="p-3"><div class="h-4 w-8 bg-gray-200 rounded skeleton"></div></td>
+                    <td class="p-3"><div class="h-4 w-24 bg-gray-200 rounded skeleton"></div></td>
+                    <td class="p-3"><div class="h-4 w-32 bg-gray-200 rounded skeleton"></div></td>
+                    <td class="p-3"><div class="h-4 w-20 bg-gray-200 rounded skeleton"></div></td>
+                    <td class="p-3"><div class="h-6 w-28 bg-gray-200 rounded-full skeleton"></div></td>
+                    <td class="p-3"><div class="h-4 w-12 bg-gray-200 rounded skeleton"></div></td>
+                </tr>`;
+            }
+            tbody.innerHTML = rows;
+        }
+
+        async function fetchPengajuan() {
+            const tbody = document.getElementById('tableBody');
+            const { data, error } = await supabaseClient
+                .from('pengajuan')
+                .select(`*, pengaju:admin_ksm_id (nama_lengkap, ksm)`)
+                .order('created_at', { ascending: false });
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-400">Gagal memuat data: ${error.message}</td></tr>`;
+                return;
+            }
+            allPengajuan = data;
+            updateStatCards();
+            applyTabFilter();
+        }
+
+        function updateStatCards() {
+            const total = allPengajuan.length;
+            const disetujui = allPengajuan.filter(p => p.status === 'disetujui').length;
+            const ditolak = allPengajuan.filter(p => p.status === 'ditolak').length;
+            const tugasSaya = allPengajuan.filter(isMyTask).length;
+            document.getElementById('countTugasSaya').textContent = tugasSaya;
+            document.getElementById('countSemua').textContent = total;
+            document.getElementById('countDisetujui').textContent = disetujui;
+            document.getElementById('countDitolak').textContent = ditolak;
+        }
+
+        function applyTabFilter() {
+            let base = [...allPengajuan];
+            if (activeTab === 'tugas-saya') base = base.filter(isMyTask);
+            else if (activeTab === 'disetujui') base = base.filter(p => p.status === 'disetujui');
+            else if (activeTab === 'ditolak') base = base.filter(p => p.status === 'ditolak');
+            applyFormFilter(base);
+        }
+
+        function applyFormFilter(baseData) {
+            const namaObat = document.getElementById('searchObat').value.toLowerCase().trim();
+            const dari = document.getElementById('dariTanggal').value;
+            const sampai = document.getElementById('sampaiTanggal').value;
+            const ksm = document.getElementById('filterKsm').value;
+            filteredPengajuan = baseData.filter(item => {
+                if (namaObat && !item.nama_obat.toLowerCase().includes(namaObat)) return false;
+                const tgl = item.tanggal_pengajuan;
+                if (dari && tgl < dari) return false;
+                if (sampai && tgl > sampai) return false;
+                if (ksm && item.pengaju?.ksm !== ksm) return false;
+                return true;
+            });
+            currentPage = 1;
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const infoJumlah = document.getElementById('infoJumlah');
+            if (filteredPengajuan.length === 0) {
+                const emptyMsg = activeTab === 'tugas-saya' 
+                    ? '🎉 Tidak ada tugas untuk Anda saat ini. Kerja bagus!'
+                    : 'Tidak ada data yang cocok dengan filter.';
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-400">${emptyMsg}</td></tr>`;
+                infoJumlah.textContent = `Menampilkan 0 data`;
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+            const totalPages = Math.ceil(filteredPengajuan.length / PER_PAGE);
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+            const startIdx = (currentPage - 1) * PER_PAGE;
+            const endIdx = startIdx + PER_PAGE;
+            const pageData = filteredPengajuan.slice(startIdx, endIdx);
+
+            tbody.innerHTML = pageData.map((item, idx) => {
+                const globalIdx = startIdx + idx;
+                const highlight = isMyTask(item);
+                const rowClass = highlight ? 'bg-yellow-50 border-l-4 border-yellow-400 hover:bg-yellow-100' : 'hover:bg-gray-50';
+                return `
+                    <tr class="${rowClass} transition">
+                        <td class="p-3">${globalIdx + 1}</td>
+                        <td class="p-3">
+                            <div class="font-medium">${relativeTime(item.tanggal_pengajuan)}</div>
+                            <div class="text-xs text-gray-400">${new Date(item.tanggal_pengajuan).toLocaleDateString('id-ID')}</div>
+                        </td>
+                        <td class="p-3 font-medium">${item.nama_obat}</td>
+                        <td class="p-3">${item.pengaju?.ksm || '-'}</td>
+                        <td class="p-3">${getStatusBadge(item.status)}</td>
+                        <td class="p-3">
+                            <button class="text-rsud hover:underline text-sm font-medium" onclick="lihatDetail('${item.id}')">
+                                ${highlight ? '👉 Proses' : 'Lihat'}
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            const tabLabel = { 'tugas-saya': 'Tugas Saya', 'semua': 'Semua Pengajuan', 'disetujui': 'Disetujui', 'ditolak': 'Ditolak' }[activeTab];
+            infoJumlah.textContent = `Menampilkan ${startIdx + 1}-${Math.min(endIdx, filteredPengajuan.length)} dari ${filteredPengajuan.length} data di "${tabLabel}"`;
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            const container = document.getElementById('pagination');
+            if (totalPages <= 1) { container.innerHTML = ''; return; }
+            let html = '<div class="flex items-center justify-center gap-1 flex-wrap">';
+            const prevDisabled = currentPage === 1;
+            html += `<button onclick="goToPage(${currentPage - 1})" ${prevDisabled ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg text-sm font-medium border ${prevDisabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'}">‹ Prev</button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                if (totalPages > 7) {
+                    if (i !== 1 && i !== totalPages && Math.abs(i - currentPage) > 1) {
+                        if (i === 2 || i === totalPages - 1) html += `<span class="px-2 text-gray-400">...</span>`;
+                        continue;
+                    }
+                }
+                const active = i === currentPage;
+                html += `<button onclick="goToPage(${i})" class="px-3 py-1.5 rounded-lg text-sm font-medium border ${active ? 'bg-rsud text-white border-rsud' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'}">${i}</button>`;
+            }
+            const nextDisabled = currentPage === totalPages;
+            html += `<button onclick="goToPage(${currentPage + 1})" ${nextDisabled ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg text-sm font-medium border ${nextDisabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'}">Next ›</button>`;
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            const totalPages = Math.ceil(filteredPengajuan.length / PER_PAGE);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderTable();
+            document.getElementById('tableScroll').scrollTop = 0;
+        }
+
+        function switchTab(tabName) {
+            activeTab = tabName;
+            currentPage = 1;
+            document.querySelectorAll('.stat-card').forEach(card => {
+                if (card.dataset.tab === tabName) {
+                    card.classList.add('active');
+                    if (tabName === 'tugas-saya') {
+                        card.classList.add('bg-rsud', 'text-white');
+                        card.classList.remove('bg-white', 'text-gray-700');
+                    }
+                } else { card.classList.remove('active'); }
+            });
+            applyTabFilter();
+        }
+
+        function resetFilter() {
+            document.getElementById('searchObat').value = '';
+            document.getElementById('dariTanggal').value = '';
+            document.getElementById('sampaiTanggal').value = '';
+            document.getElementById('tipePengajuan').value = '';
+            document.getElementById('filterKsm').value = '';
+            currentPage = 1;
+            applyTabFilter();
+        }
+
+        function exportExcel() {
+            if (filteredPengajuan.length === 0) { alert('Tidak ada data untuk diekspor.'); return; }
+            const dataExcel = filteredPengajuan.map((item, index) => ({
+                'No': index + 1,
+                'Tanggal Pengajuan': new Date(item.tanggal_pengajuan).toLocaleDateString('id-ID'),
+                'Nama Obat': item.nama_obat,
+                'KSM': item.pengaju?.ksm || '-',
+                'Pemberi Persetujuan': item.pemberi_persetujuan || '-',
+                'Alasan Pengajuan': item.alasan_pengajuan || '-',
+                'Status': item.status.replace(/_/g, ' ').toUpperCase(),
+                'Tanggal Dibuat': new Date(item.created_at).toLocaleString('id-ID')
+            }));
+            const ws = XLSX.utils.json_to_sheet(dataExcel);
+            ws['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 25 }, { wch: 20 }, { wch: 25 }, { wch: 40 }, { wch: 20 }, { wch: 20 }];
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Pengajuan Obat');
+            const today = new Date();
+            const fileName = `pengajuan-obat-${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+        }
+
+        function openPrintModal() {
+            if (filteredPengajuan.length === 0) { alert('Tidak ada data untuk dicetak.'); return; }
+            document.getElementById('modalCountDaftar').textContent = filteredPengajuan.length;
+            document.getElementById('printModal').classList.remove('hidden');
+            document.querySelector('input[name="printMode"][value="daftar"]').checked = true;
+            onPrintModeChange();
+        }
+
+        function closePrintModal() { document.getElementById('printModal').classList.add('hidden'); }
+
+        function onPrintModeChange() {
+            const mode = document.querySelector('input[name="printMode"]:checked').value;
+            const formList = document.getElementById('modalFormList');
+            document.getElementById('radioDaftarLabel').className = mode === 'daftar' ? 'flex items-start gap-3 p-4 border-2 border-emerald-500 bg-emerald-50 rounded-lg cursor-pointer transition' : 'flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-emerald-400 transition';
+            document.getElementById('radioFormLabel').className = mode === 'form' ? 'flex items-start gap-3 p-4 border-2 border-emerald-500 bg-emerald-50 rounded-lg cursor-pointer transition' : 'flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-emerald-400 transition';
+            if (mode === 'form') {
+                formList.classList.remove('hidden');
+                renderCheckboxList();
+            } else { formList.classList.add('hidden'); }
+        }
+
+        function renderCheckboxList() {
+            const container = document.getElementById('modalCheckboxList');
+            container.innerHTML = filteredPengajuan.map((item) => `
+                <label class="flex items-center gap-3 p-2 hover:bg-white rounded cursor-pointer transition">
+                    <input type="checkbox" class="modal-checkbox w-4 h-4" value="${item.id}" onchange="updateSelectedCount()">
+                    <div class="flex-1 text-sm">
+                        <div class="font-medium text-gray-800">${item.nama_obat}</div>
+                        <div class="text-xs text-gray-500">${new Date(item.tanggal_pengajuan).toLocaleDateString('id-ID')} • ${item.pengaju?.ksm || '-'}</div>
+                    </div>
+                </label>
+            `).join('');
+            updateSelectedCount();
+        }
+
+        function selectAllForm(checked) {
+            document.querySelectorAll('.modal-checkbox').forEach(cb => { cb.checked = checked; });
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const count = document.querySelectorAll('.modal-checkbox:checked').length;
+            document.getElementById('modalCountSelected').textContent = count;
+        }
+
+        function doPrint() {
+            const mode = document.querySelector('input[name="printMode"]:checked').value;
+            let ids = [];
+            if (mode === 'daftar') { ids = filteredPengajuan.map(p => p.id); } 
+            else {
+                ids = Array.from(document.querySelectorAll('.modal-checkbox:checked')).map(cb => cb.value);
+                if (ids.length === 0) { alert('Pilih minimal 1 pengajuan untuk dicetak.'); return; }
+            }
+            const idsParam = ids.join(',');
+            window.open(`cetak.html?mode=${mode}&ids=${encodeURIComponent(idsParam)}`, '_blank');
+            closePrintModal();
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; });
+        document.getElementById('ajukanBtn').addEventListener('click', () => { window.location.href = 'pengajuan.html'; });
+        document.getElementById('searchBtn').addEventListener('click', () => { currentPage = 1; applyTabFilter(); });
+        document.getElementById('resetFilter').addEventListener('click', resetFilter);
+        document.getElementById('exportBtn').addEventListener('click', exportExcel);
+        document.getElementById('printBtn').addEventListener('click', openPrintModal);
+        document.getElementById('searchObat').addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); currentPage = 1; applyTabFilter(); } });
+        document.querySelectorAll('.stat-card').forEach(card => { card.addEventListener('click', () => switchTab(card.dataset.tab)); });
+        document.getElementById('printModal').addEventListener('click', (e) => { if (e.target.id === 'printModal') closePrintModal(); });
+
+        function lihatDetail(id) { window.location.href = 'detail.html?id=' + id; }
+
+        checkAuth();
+    </script>
 </body>
 </html>
