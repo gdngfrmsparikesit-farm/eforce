@@ -18,18 +18,16 @@
 <body class="bg-gray-50 font-sans">
 
     <header class="bg-white shadow-sm border-b sticky top-0 z-10">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <div class="h-10 w-32 bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs font-semibold">RSUD AMP</div>
-            </div>
-            <div class="flex items-center gap-3">
-                <a href="panduan.html" class="bg-rsud text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-emerald-700 transition">Cara Penggunaan</a>
-                <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-600 transition">Sign Out</button>
+        <div class="w-full max-w-[95%] lg:max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="h-10 w-32 bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs font-semibold">RSUD AMP</div>
+            <div class="flex items-center gap-2 md:gap-3">
+                <a href="panduan.html" class="bg-rsud text-white px-3 md:px-4 py-2 rounded-full text-xs md:text-sm font-medium hover:bg-emerald-700 transition">Cara Penggunaan</a>
+                <button id="logoutBtn" class="bg-red-500 text-white px-3 md:px-4 py-2 rounded-full text-xs md:text-sm font-medium hover:bg-red-600 transition">Sign Out</button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-4 py-8">
+    <main class="w-full max-w-[95%] lg:max-w-4xl mx-auto px-4 py-6 md:py-8">
 
         <nav class="text-sm text-gray-500 mb-3">
             <a href="dashboard.html" class="hover:text-emerald-600">🏠 Dashboard</a>
@@ -38,53 +36,55 @@
         </nav>
 
         <a href="dashboard.html" class="inline-flex items-center gap-2 px-4 py-2 border border-emerald-300 text-rsud rounded-full text-sm hover:bg-emerald-50 transition mb-6">
-            <span>‹</span> Kembali Ke Halaman Awal
+            <span>‹</span> Kembali
         </a>
 
-        <div class="flex items-center justify-between mb-8 px-4">
+        <!-- Progress Bar (Disembunyikan teksnya di HP) -->
+        <div class="flex items-center justify-between mb-6 md:mb-8 px-1 md:px-4">
             <div class="flex flex-col items-center flex-1">
-                <div class="w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold step-active">1</div>
-                <span class="text-xs mt-2 text-gray-700 text-center">Admin KSM</span>
+                <div class="w-8 h-8 md:w-12 md:h-12 text-sm md:text-base rounded-full border-2 flex items-center justify-center font-bold step-active">1</div>
+                <span class="text-[10px] md:text-xs mt-1 md:mt-2 text-gray-700 text-center hidden sm:block">Admin KSM</span>
             </div>
-            <div class="flex-1 h-0.5 bg-gray-300 -mt-6"></div>
+            <div class="flex-1 h-0.5 bg-gray-300 -mt-4 md:-mt-6"></div>
             <div class="flex flex-col items-center flex-1">
-                <div class="w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold step-inactive">2</div>
-                <span class="text-xs mt-2 text-gray-500 text-center">Ketua KSM</span>
+                <div class="w-8 h-8 md:w-12 md:h-12 text-sm md:text-base rounded-full border-2 flex items-center justify-center font-bold step-inactive">2</div>
+                <span class="text-[10px] md:text-xs mt-1 md:mt-2 text-gray-500 text-center hidden sm:block">Ketua KSM</span>
             </div>
-            <div class="flex-1 h-0.5 bg-gray-300 -mt-6"></div>
+            <div class="flex-1 h-0.5 bg-gray-300 -mt-4 md:-mt-6"></div>
             <div class="flex flex-col items-center flex-1">
-                <div class="w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold step-inactive">3</div>
-                <span class="text-xs mt-2 text-gray-500 text-center">Anggota PFT</span>
+                <div class="w-8 h-8 md:w-12 md:h-12 text-sm md:text-base rounded-full border-2 flex items-center justify-center font-bold step-inactive">3</div>
+                <span class="text-[10px] md:text-xs mt-1 md:mt-2 text-gray-500 text-center hidden sm:block">Anggota PFT</span>
             </div>
-            <div class="flex-1 h-0.5 bg-gray-300 -mt-6"></div>
+            <div class="flex-1 h-0.5 bg-gray-300 -mt-4 md:-mt-6"></div>
             <div class="flex flex-col items-center flex-1">
-                <div class="w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold step-inactive">4</div>
-                <span class="text-xs mt-2 text-gray-500 text-center">Ketua PFT</span>
+                <div class="w-8 h-8 md:w-12 md:h-12 text-sm md:text-base rounded-full border-2 flex items-center justify-center font-bold step-inactive">4</div>
+                <span class="text-[10px] md:text-xs mt-1 md:mt-2 text-gray-500 text-center hidden sm:block">Ketua PFT</span>
             </div>
-            <div class="flex-1 h-0.5 bg-gray-300 -mt-6"></div>
+            <div class="flex-1 h-0.5 bg-gray-300 -mt-4 md:-mt-6"></div>
             <div class="flex flex-col items-center flex-1">
-                <div class="w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold step-inactive">5</div>
-                <span class="text-xs mt-2 text-gray-500 text-center">Wakil Direktur</span>
+                <div class="w-8 h-8 md:w-12 md:h-12 text-sm md:text-base rounded-full border-2 flex items-center justify-center font-bold step-inactive">5</div>
+                <span class="text-[10px] md:text-xs mt-1 md:mt-2 text-gray-500 text-center hidden sm:block">Wakil Direktur</span>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl border border-emerald-200 shadow-sm p-8">
-            <h1 class="text-2xl font-bold text-rsud text-center mb-8">Pengajuan Pengadaan Reguler</h1>
+        <div class="bg-white rounded-2xl border border-emerald-200 shadow-sm p-4 md:p-8">
+            <h1 class="text-xl md:text-2xl font-bold text-rsud text-center mb-6 md:mb-8">Pengajuan Pengadaan Reguler</h1>
 
-            <form id="pengajuanForm" class="space-y-6">
+            <form id="pengajuanForm" class="space-y-5 md:space-y-6">
+                
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Pengajuan <span class="text-red-500">*</span></label>
-                    <input type="date" id="tanggalPengajuan" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+                    <input type="date" id="tanggalPengajuan" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nama Obat <span class="text-red-500">*</span></label>
-                    <input type="text" id="namaObat" required placeholder="Contoh: Vitamin" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+                    <input type="text" id="namaObat" required placeholder="Contoh: Vitamin" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">EBM & PPK/Konsensus <span class="text-red-500">*</span></label>
-                    <div id="ebmContainer" class="border border-gray-200 rounded-lg p-4 space-y-3 bg-gray-50"></div>
+                    <div id="ebmContainer" class="border border-gray-200 rounded-lg p-3 md:p-4 space-y-3 bg-gray-50"></div>
                     <button type="button" id="tambahEbmBtn" class="mt-3 bg-rsud text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-emerald-700 transition flex items-center gap-1">
                         <span>+</span> Tambah Baru
                     </button>
@@ -92,12 +92,12 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Alasan Pengajuan <span class="text-red-500">*</span></label>
-                    <textarea id="alasanPengajuan" required rows="4" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none"></textarea>
+                    <textarea id="alasanPengajuan" required rows="4" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none resize-none"></textarea>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Pemberi Persetujuan <span class="text-red-500">*</span></label>
-                    <select id="pemberiPersetujuan" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none bg-white">
+                    <select id="pemberiPersetujuan" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
                         <option value="">-- Pilih Pemberi Persetujuan --</option>
                         <option value="Ketua KSM Jantung">Ketua KSM Jantung</option>
                         <option value="Ketua KSM Saraf dan Jiwa">Ketua KSM Saraf dan Jiwa</option>
@@ -118,129 +118,7 @@
         </div>
     </main>
 
-    <script src="emailHelper.js"></script>
-    <script>
-        const SUPABASE_URL = 'https://liyjnpjawjkobopwuhnb.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpeWpucGphd2prb2JvcHd1aG5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2Mjk5MTMsImV4cCI6MjEwNTIwNTkxM30.xAZRyHQQf2c1jYOIlcUpy_XnwScwSdg6bs8on7_t1Nw';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <!-- (Salin seluruh isi script Javascript dari file pengajuan.html Anda yang sebelumnya ke sini, TIDAK ADA yang perlu diubah pada logikanya) -->
 
-        let currentUserProfile = null;
-
-        async function checkAuth() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
-                window.location.href = 'index.html';
-                return;
-            }
-            const { data: profile } = await supabaseClient
-                .from('users')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-            currentUserProfile = profile;
-            document.getElementById('tanggalPengajuan').valueAsDate = new Date();
-            tambahBarisEbm();
-        }
-
-        function tambahBarisEbm() {
-            const container = document.getElementById('ebmContainer');
-            const row = document.createElement('div');
-            row.className = 'ebm-row flex gap-2 items-center';
-            row.innerHTML = `
-                <select class="ebm-tipe px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none w-32">
-                    <option value="EBM">EBM</option>
-                    <option value="PPK">PPK</option>
-                    <option value="Konsensus">Konsensus</option>
-                </select>
-                <input type="text" class="ebm-nama flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Nama (contoh: EBM Vita)">
-                <input type="text" class="ebm-link flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Link (contoh: https://...)">
-                <button type="button" class="hapus-ebm text-red-500 hover:text-red-700 px-2 text-xl font-bold" title="Hapus">🗑</button>
-            `;
-            row.querySelector('.hapus-ebm').addEventListener('click', () => {
-                if (container.querySelectorAll('.ebm-row').length > 1) row.remove();
-                else alert('Minimal harus ada 1 baris EBM/PPK.');
-            });
-            container.appendChild(row);
-        }
-
-        document.getElementById('tambahEbmBtn').addEventListener('click', tambahBarisEbm);
-
-        document.getElementById('pengajuanForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            const errorMsg = document.getElementById('errorMsg');
-            
-            btn.textContent = 'Mengirim...';
-            btn.disabled = true;
-            errorMsg.classList.add('hidden');
-
-            const ebmRows = document.querySelectorAll('.ebm-row');
-            const ebmData = [];
-            ebmRows.forEach(row => {
-                const tipe = row.querySelector('.ebm-tipe').value;
-                const nama = row.querySelector('.ebm-nama').value.trim();
-                const link = row.querySelector('.ebm-link').value.trim();
-                if (nama) ebmData.push({ tipe, nama, link });
-            });
-
-            if (ebmData.length === 0) {
-                errorMsg.textContent = 'Minimal isi 1 nama EBM/PPK/Konsensus.';
-                errorMsg.classList.remove('hidden');
-                btn.textContent = 'Submit';
-                btn.disabled = false;
-                return;
-            }
-
-            const payload = {
-                p_tanggal: document.getElementById('tanggalPengajuan').value,
-                p_nama_obat: document.getElementById('namaObat').value,
-                p_ebm_ppk: ebmData,
-                p_alasan: document.getElementById('alasanPengajuan').value,
-                p_pemberi_persetujuan: document.getElementById('pemberiPersetujuan').value
-            };
-
-            const { data, error } = await supabaseClient.rpc('submit_pengajuan', payload);
-
-            if (error) {
-                errorMsg.textContent = 'Gagal submit: ' + error.message;
-                errorMsg.classList.remove('hidden');
-                btn.textContent = 'Submit';
-                btn.disabled = false;
-                return;
-            }
-
-            alert('Pengajuan berhasil dikirim!');
-            
-            // === KIRIM EMAIL KE KETUA KSM (opsional, tidak akan crash jika gagal) ===
-            try {
-                if (typeof sendEmailNotif === 'function') {
-                    await sendEmailNotif(
-                        'ketua_ksm',
-                        {
-                            id: data,
-                            nama_obat: payload.p_nama_obat,
-                            pengaju: currentUserProfile
-                        },
-                        'Menunggu Persetujuan',
-                        'Pengajuan baru menunggu review Anda',
-                        supabaseClient
-                    );
-                } else {
-                    console.warn('emailHelper.js tidak ditemukan. Email dilewati.');
-                }
-            } catch (emailErr) {
-                console.error('Email gagal, tapi pengajuan tetap berhasil:', emailErr);
-            }
-            
-            window.location.href = 'dashboard.html';
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
-            await supabaseClient.auth.signOut();
-            window.location.href = 'index.html';
-        });
-
-        checkAuth();
-    </script>
 </body>
 </html>
