@@ -2,16 +2,19 @@ name: Supabase Keep-Alive
 
 on:
   schedule:
-    # Berjalan setiap 3 hari pada pukul 00:00 UTC
-    - cron: '0 0 */3 * *'
-  workflow_dispatch: # Memungkinkan menjalankan manual dari tab Actions
+    # Berjalan setiap hari pada pukul 00:00 UTC
+    - cron: '0 0 * * *' 
+  workflow_dispatch: 
 
 jobs:
   ping-supabase:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase Database
+      - name: Update Keepalive Timestamp
         run: |
-          curl -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/keepalive?select=*&limit=1" \
+          curl -X PATCH "${{ secrets.SUPABASE_URL }}/rest/v1/keepalive?id=eq.1" \
           -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-          -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+          -H "Content-Type: application/json" \
+          -H "Prefer: return=minimal" \
+          -d "{\"pinged_at\": \"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"}"
