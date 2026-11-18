@@ -542,6 +542,7 @@
 
         document.getElementById('logoutBtn').addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; });
         document.getElementById('ajukanBtn').addEventListener('click', () => { window.location.href = 'pengajuan.html'; });
+        document.getElementById('masterObatBtn').addEventListener('click', () => { window.location.href = 'master_obat.html'; });
         document.getElementById('searchBtn').addEventListener('click', () => { currentPage = 1; applyTabFilter(); });
         document.getElementById('resetFilter').addEventListener('click', resetFilter);
         document.getElementById('exportBtn').addEventListener('click', exportExcel);
