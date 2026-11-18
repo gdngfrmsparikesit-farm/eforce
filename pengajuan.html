@@ -77,10 +77,12 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Obat <span class="text-red-500">*</span></label>
-                    <input type="text" id="namaObat" required placeholder="Contoh: Vitamin" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Obat (Formularium) <span class="text-red-500">*</span></label>
+                    <select id="pilihObat" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
+                        <option value="">Memuat data obat...</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">Hanya obat yang terdaftar di Formularium yang bisa diajukan.</p>
                 </div>
-
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">EBM & PPK/Konsensus <span class="text-red-500">*</span></label>
                     <div id="ebmContainer" class="border border-gray-200 rounded-lg p-3 md:p-4 space-y-3 bg-gray-50"></div>
@@ -127,18 +129,46 @@
 
         async function checkAuth() {
             const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
-                window.location.href = 'index.html';
-                return;
-            }
-            const { data: profile } = await supabaseClient
-                .from('users')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
+            if (!session) { window.location.href = 'index.html'; return; }
+            
+            const { data: profile } = await supabaseClient.from('users').select('*').eq('id', session.user.id).single();
             currentUserProfile = profile;
+            
             document.getElementById('tanggalPengajuan').valueAsDate = new Date();
             tambahBarisEbm();
+            
+            // TAMBAHKAN BARIS INI UNTUK MEMUAT DATA OBAT
+            loadMasterObat(); 
+        }
+
+        // FUNGSI BARU UNTUK MENGAMBIL DATA DARI MASTER OBAT
+        async function loadMasterObat() {
+            const select = document.getElementById('pilihObat');
+            // Hanya ambil obat yang is_active = true (belum dihapus)
+            const { data, error } = await supabaseClient
+                .from('master_obat')
+                .select('id, nama_generik, nama_dagang, bentuk_sediaan, kekuatan_dosis')
+                .eq('is_active', true)
+                .order('nama_generik', { ascending: true });
+
+            if (error) {
+                select.innerHTML = `<option value="">Gagal memuat obat: ${error.message}</option>`;
+                return;
+            }
+
+            if (data.length === 0) {
+                select.innerHTML = `<option value="">Belum ada data obat di Formularium</option>`;
+                return;
+            }
+
+            select.innerHTML = '<option value="">-- Pilih Obat --</option>' + data.map(obat => {
+                // Format tampilan: Paracetamol (Sanmol) - Tablet 500mg
+                let label = obat.nama_generik;
+                if (obat.nama_dagang) label += ` (${obat.nama_dagang})`;
+                label += ` - ${obat.bentuk_sediaan} ${obat.kekuatan_dosis || ''}`;
+                
+                return `<option value="${obat.id}" data-nama="${obat.nama_generik}">${label}</option>`;
+            }).join('');
         }
 
         function tambahBarisEbm() {
@@ -190,9 +220,22 @@
                 return;
             }
 
+            const pilihObat = document.getElementById('pilihObat');
+            const selectedOption = pilihObat.options[pilihObat.selectedIndex];
+            
+            // Validasi apakah user sudah memilih obat
+            if (!pilihObat.value) {
+                errorMsg.textContent = 'Silakan pilih obat dari daftar formularium.';
+                errorMsg.classList.remove('hidden');
+                btn.textContent = 'Submit';
+                btn.disabled = false;
+                return;
+            }
+
             const payload = {
                 p_tanggal: document.getElementById('tanggalPengajuan').value,
-                p_nama_obat: document.getElementById('namaObat').value,
+                p_nama_obat: selectedOption.getAttribute('data-nama'), // Ambil nama dari atribut data-nama
+                p_master_obat_id: pilihObat.value, // Kirim ID obatnya
                 p_ebm_ppk: ebmData,
                 p_alasan: document.getElementById('alasanPengajuan').value,
                 p_pemberi_persetujuan: document.getElementById('pemberiPersetujuan').value
