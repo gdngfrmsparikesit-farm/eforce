@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kamus Obat - E-Fors</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- TOM SELECT CSS & JS -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+
+    <style>
+        .bg-rsud { background-color: #059669; }
+        .text-rsud { color: #059669; }
+        
+        /* Customisasi Tom Select */
+        .ts-wrapper.single .ts-control {
+            background-color: #fff;
+            border: 2px solid #10b981;
+            border-radius: 1rem;
+            padding: 1rem 1.25rem;
+            font-size: 1.125rem;
+            color: #1f2937;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .ts-wrapper.focus .ts-control {
+            box-shadow: 0 0 0 4px #a7f3d0;
+            border-color: #059669;
+            outline: none;
+        }
+        .ts-dropdown {
+            border-radius: 1rem;
+            border: 1px solid #d1d5db;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+        .ts-dropdown .option.active {
+            background-color: #ecfdf5;
+            color: #047857;
+            font-weight: bold;
+        }
+        
+        /* Animasi Fade In untuk Detail */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b sticky top-0 z-20">
+        <div class="w-full max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="h-8 w-24 bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs font-semibold">RSUD AMP</div>
+                <span class="font-bold text-gray-700 hidden sm:block">Kamus Formularium</span>
+            </div>
+            <div class="flex items-center gap-2 md:gap-3">
+                <a href="dashboard.html" class="bg-gray-500 text-white px-3 md:px-4 py-2 rounded-full text-xs md:text-sm font-medium hover:bg-gray-600 transition">Kembali</a>
+                <button id="logoutBtn" class="bg-red-500 text-white px-3 md:px-4 py-2 rounded-full text-xs md:text-sm font-medium hover:bg-red-600 transition">Sign Out</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-4xl mx-auto px-4 py-8 md:py-12">
+        
+        <!-- Bagian Pencarian (Hero) -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-3">🔍 Cari Informasi Obat</h1>
+            <p class="text-gray-500 max-w-2xl mx-auto">Ketik nama generik atau nama dagang. Sistem akan menampilkan rincian, restriksi, dan status jaminan secara instan.</p>
+        </div>
+
+        <div class="mb-10 shadow-lg rounded-2xl">
+            <select id="pencarianObat" placeholder="Ketik nama obat... (contoh: Paracetamol, Ceftriaxone)"></select>
+        </div>
+
+        <!-- Empty State (Tampil saat belum ada obat yang dipilih) -->
+        <div id="emptyState" class="text-center py-16 bg-white rounded-3xl border border-gray-200 shadow-sm">
+            <div class="text-6xl mb-4 opacity-50">💊</div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">Belum Ada Obat yang Dipilih</h3>
+            <p class="text-gray-500">Silakan gunakan kolom pencarian di atas untuk melihat detail obat.</p>
+        </div>
+
+        <!-- Konten Detail Obat (Disembunyikan sampai ada yang dipilih) -->
+        <div id="detailContainer" class="hidden animate-fade-in space-y-4">
+            
+            <!-- Kartu Header Obat -->
+            <div class="bg-rsud rounded-3xl p-6 md:p-8 text-white shadow-md relative overflow-hidden">
+                <div class="relative z-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-4">
+                        <div>
+                            <span id="badgeKategori" class="text-xs font-bold bg-white/20 px-3 py-1 rounded-full mb-2 inline-block">-</span>
+                            <h1 id="namaGenerik" class="text-3xl md:text-4xl font-bold leading-tight">-</h1>
+                            <p id="namaDagang" class="text-emerald-100 text-lg mt-1 font-medium">-</p>
+                        </div>
+                        <div id="statusBadge" class="text-sm font-bold bg-white text-rsud px-4 py-2 rounded-xl shadow-sm">
+                            -
+                        </div>
+                    </div>
+                </div>
+                <!-- Ornamen Background -->
+                <div class="absolute -bottom-10 -right-10 text-9xl opacity-10">💊</div>
+            </div>
+
+            <!-- Grid Informasi -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Kolom Kiri -->
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-5">
+                    <div class="flex items-start gap-4">
+                        <span class="text-3xl bg-gray-50 p-2 rounded-lg">📦</span>
+                        <div>
+                            <div class="text-xs text-gray-500 uppercase font-bold tracking-wider">Sediaan & Dosis</div>
+                            <div id="sediaanDosis" class="text-gray-800 font-semibold text-lg">-</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <span class="text-3xl bg-gray-50 p-2 rounded-lg">🏥</span>
+                        <div>
+                            <div class="text-xs text-gray-500 uppercase font-bold tracking-wider">Kelompok Obat</div>
+                            <div id="kelompokObat" class="text-gray-800 font-semibold text-lg">-</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <span class="text-3xl bg-gray-50 p-2 rounded-lg">🔖</span>
+                        <div>
+                            <div class="text-xs text-gray-500 uppercase font-bold tracking-wider">Kode Obat</div>
+                            <div id="kodeObat" class="text-gray-800 font-mono">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kolom Kanan -->
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-5">
+                    <div class="flex items-start gap-4">
+                        <span class="text-3xl bg-gray-50 p-2 rounded-lg">💳</span>
+                        <div>
+                            <div class="text-xs text-gray-500 uppercase font-bold tracking-wider">Jaminan (BPJS)</div>
+                            <div id="statusJaminan" class="font-bold text-lg">-</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <span class="text-3xl bg-gray-50 p-2 rounded-lg">🏭</span>
+                        <div>
+                            <div class="text-xs text-gray-500 uppercase font-bold tracking-wider">Vendor Utama</div>
+                            <div id="vendorUtama" class="text-gray-800 font-semibold">-</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <span class="text-3xl bg-gray-50 p-2 rounded-lg">❤️</span>
+                        <div>
+                            <div class="text-xs text-gray-500 uppercase font-bold tracking-wider">Obat Kronis?</div>
+                            <div id="isKronis" class="font-bold">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Restriksi Penggunaan (Kotak Orange) -->
+            <div class="bg-orange-50 rounded-2xl border border-orange-200 shadow-sm p-6 md:p-8">
+                <h2 class="text-lg font-bold text-orange-800 mb-3 flex items-center gap-2">
+                    <span>⚠️</span> Catatan Penting & Restriksi
+                </h2>
+                <div id="restriksi" class="text-orange-900 text-md leading-relaxed bg-white/70 p-5 rounded-xl border border-orange-100 font-medium">
+                    -
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = 'https://liyjnpjawjkobopwuhnb.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_1ia1Sofbm9IFgO3cQbeiPw_KNslUtii';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let allObatData = []; // Menyimpan semua data untuk pencarian instan
+
+        async function init() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) { window.location.href = 'index.html'; return; }
+
+            // Ambil semua data obat
+            const { data, error } = await supabaseClient
+                .from('master_obat')
+                .select('*')
+                .order('nama_generik', { ascending: true });
+
+            if (error) {
+                alert('Gagal memuat database obat.');
+                return;
+            }
+
+            allObatData = data;
+
+            // Isi data ke dalam Tom Select
+            const selectEl = document.getElementById('pencarianObat');
+            selectEl.innerHTML = '<option value="">Ketik nama obat...</option>' + data.map(obat => {
+                let label = obat.nama_generik;
+                if (obat.nama_dagang) label += ` (${obat.nama_dagang})`;
+                label += ` - ${obat.bentuk_sediaan} ${obat.kekuatan_dosis || ''}`;
+                return `<option value="${obat.id}">${label}</option>`;
+            }).join('');
+
+            // Inisialisasi Tom Select
+            new TomSelect("#pencarianObat", {
+                create: false,
+                sortField: { field: "text", direction: "asc" },
+                maxOptions: 50,
+                placeholder: "Ketik nama obat... (contoh: Paracetamol)",
+                onChange: function(value) {
+                    if (value) {
+                        renderDetail(value);
+                    } else {
+                        document.getElementById('detailContainer').classList.add('hidden');
+                        document.getElementById('emptyState').classList.remove('hidden');
+                    }
+                }
+            });
+        }
+
+        function renderDetail(id) {
+            const obat = allObatData.find(o => o.id === id);
+            if (!obat) return;
+
+            // Sembunyikan Empty State, Tampilkan Container
+            document.getElementById('emptyState').classList.add('hidden');
+            const detailContainer = document.getElementById('detailContainer');
+            detailContainer.classList.remove('hidden');
+
+            // Isi Data
+            document.getElementById('namaGenerik').textContent = obat.nama_generik;
+            document.getElementById('namaDagang').textContent = obat.nama_dagang ? `Nama Dagang: ${obat.nama_dagang}` : '';
+            document.getElementById('badgeKategori').textContent = obat.kode_kategori || 'Umum';
+            
+            document.getElementById('sediaanDosis').textContent = `${obat.bentuk_sediaan} ${obat.kekuatan_dosis ? `(${obat.kekuatan_dosis})` : ''}`;
+            document.getElementById('kelompokObat').textContent = obat.kelompok_obat || '-';
+            document.getElementById('kodeObat').textContent = obat.kode_obat || 'Tidak ada kode';
+            document.getElementById('vendorUtama').textContent = obat.vendor_utama || 'Belum diatur';
+
+            // Status Jaminan
+            const elJaminan = document.getElementById('statusJaminan');
+            elJaminan.textContent = obat.status_jaminan;
+            elJaminan.className = obat.status_jaminan === 'Fornas' 
+                ? 'font-bold text-lg text-blue-600' 
+                : 'font-bold text-lg text-gray-500';
+
+            // Status Kronis
+            const elKronis = document.getElementById('isKronis');
+            if (obat.is_kronis) {
+                elKronis.innerHTML = '✅ Ya';
+                elKronis.className = 'font-bold text-orange-600';
+            } else {
+                elKronis.innerHTML = '❌ Tidak';
+                elKronis.className = 'font-bold text-gray-500';
+            }
+
+            // Status Aktif (Badge)
+            const elBadge = document.getElementById('statusBadge');
+            if (obat.is_active) {
+                elBadge.innerHTML = '✅ TERSEDIA / AKTIF';
+                elBadge.className = 'text-sm font-bold bg-white text-green-600 px-4 py-2 rounded-xl shadow-sm';
+            } else {
+                elBadge.innerHTML = '❌ NON-AKTIF (DIHAPUS)';
+                elBadge.className = 'text-sm font-bold bg-red-500 text-white px-4 py-2 rounded-xl shadow-sm';
+            }
+
+            // Restriksi
+            const elRestriksi = document.getElementById('restriksi');
+            if (obat.restriksi_penggunaan && obat.restriksi_penggunaan !== '-' && obat.restriksi_penggunaan.trim() !== '') {
+                elRestriksi.textContent = obat.restriksi_penggunaan;
+                elRestriksi.classList.add('font-bold');
+            } else {
+                elRestriksi.textContent = 'Tidak ada batasan khusus / restriksi untuk obat ini.';
+                elRestriksi.classList.remove('font-bold');
+            }
+
+            // Scroll ke detail dengan halus
+            detailContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await supabaseClient.auth.signOut();
+            window.location.href = 'index.html';
+        });
+
+        init();
+    </script>
+</body>
+</html>
