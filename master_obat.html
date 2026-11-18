@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Formularium - E-Fors</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .bg-rsud { background-color: #059669; }
+        .text-rsud { color: #059669; }
+        @keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .skeleton { animation: pulse-slow 1.5s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b flex-shrink-0 z-20">
+        <div class="w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="h-10 w-32 bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs font-semibold">RSUD AMP</div>
+            <div class="flex items-center gap-2 md:gap-3">
+                <a href="dashboard.html" class="bg-gray-500 text-white px-3 md:px-4 py-2 rounded-full text-xs md:text-sm font-medium hover:bg-gray-600 transition">Kembali ke Dashboard</a>
+                <button id="logoutBtn" class="bg-red-500 text-white px-3 md:px-4 py-2 rounded-full text-xs md:text-sm font-medium hover:bg-red-600 transition">Sign Out</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <div class="flex-shrink-0 w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 pt-4 md:pt-5">
+            <nav class="text-sm text-gray-500 mb-2">
+                <a href="dashboard.html" class="hover:text-emerald-600">🏠 Dashboard</a>
+                <span class="mx-2">›</span>
+                <span class="text-rsud font-medium">Master Formularium</span>
+            </nav>
+
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                <h1 class="text-xl md:text-2xl font-bold text-gray-800">📚 Master Formularium Obat</h1>
+                <button id="btnTambah" class="bg-rsud text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-700 transition flex items-center gap-2 shadow-sm">
+                    <span>+</span> Tambah Obat Baru
+                </button>
+            </div>
+
+            <!-- Filter & Search -->
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-200 mb-4 flex flex-col sm:flex-row gap-3">
+                <input type="text" id="searchObat" placeholder="🔍 Cari Nama Generik / Dagang..." class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                <select id="filterKelompok" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm bg-white">
+                    <option value="">Semua Kelompok</option>
+                    <option value="Analgesik">Analgesik</option>
+                    <option value="Antibiotik">Antibiotik</option>
+                    <option value="Antihipertensi">Antihipertensi</option>
+                    <option value="Antidiabetik">Antidiabetik</option>
+                    <option value="Vitamin">Vitamin</option>
+                </select>
+                <select id="filterStatus" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm bg-white">
+                    <option value="aktif">Hanya Aktif</option>
+                    <option value="nonaktif">Hanya Non-Aktif (Dihapus)</option>
+                    <option value="semua">Tampilkan Semua</option>
+                </select>
+            </div>
+            <div id="infoJumlah" class="text-xs text-gray-500 mb-2"></div>
+        </div>
+
+        <!-- Area Tabel -->
+        <div class="flex-1 overflow-y-auto w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 pb-4">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[900px]">
+                    <thead class="sticky top-0 z-10 bg-gray-50 shadow-sm text-gray-600 text-xs uppercase tracking-wider whitespace-nowrap">
+                        <tr>
+                            <th class="p-3 font-semibold">Kode</th>
+                            <th class="p-3 font-semibold">Nama Generik</th>
+                            <th class="p-3 font-semibold">Kelompok</th>
+                            <th class="p-3 font-semibold">Sediaan / Dosis</th>
+                            <th class="p-3 font-semibold">Kategori</th>
+                            <th class="p-3 font-semibold">Jaminan</th>
+                            <th class="p-3 font-semibold">Status</th>
+                            <th class="p-3 font-semibold">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="text-gray-700 text-sm divide-y divide-gray-100"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Form Tambah/Edit -->
+    <div id="modalForm" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+            <div class="p-4 border-b flex justify-between items-center bg-gray-50 rounded-t-2xl">
+                <h3 id="modalTitle" class="text-lg font-bold text-gray-800">Tambah Obat Baru</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+            </div>
+            <div class="p-5 overflow-y-auto flex-1">
+                <form id="formObat" class="space-y-4">
+                    <input type="hidden" id="editId">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Kode Obat (Opsional)</label>
+                            <input type="text" id="inputKode" placeholder="OBT-001" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Generik <span class="text-red-500">*</span></label>
+                            <input type="text" id="inputNamaGenerik" required placeholder="Paracetamol" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Dagang</label>
+                            <input type="text" id="inputNamaDagang" placeholder="Sanmol" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Kelompok Obat <span class="text-red-500">*</span></label>
+                            <select id="inputKelompok" required class="w-full px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                                <option value="">-- Pilih --</option>
+                                <option value="Analgesik">Analgesik</option>
+                                <option value="Antibiotik">Antibiotik</option>
+                                <option value="Antihipertensi">Antihipertensi</option>
+                                <option value="Antidiabetik">Antidiabetik</option>
+                                <option value="Vitamin">Vitamin</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Bentuk Sediaan <span class="text-red-500">*</span></label>
+                            <select id="inputSediaan" required class="w-full px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                                <option value="">-- Pilih --</option>
+                                <option value="Tablet">Tablet</option>
+                                <option value="Kapsul">Kapsul</option>
+                                <option value="Sirup">Sirup</option>
+                                <option value="Injeksi">Injeksi</option>
+                                <option value="Salep">Salep</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Kekuatan / Dosis</label>
+                            <input type="text" id="inputDosis" placeholder="500 mg" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Kategori Obat</label>
+                            <select id="inputKategori" class="w-full px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                                <option value="Generik">Generik</option>
+                                <option value="Paten">Paten</option>
+                                <option value="Generik Bermerek">Generik Bermerek</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status Jaminan</label>
+                            <select id="inputJaminan" class="w-full px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                                <option value="Fornas">Fornas (BPJS)</option>
+                                <option value="Non-Fornas">Non-Fornas</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Vendor / Pabrik Utama</label>
+                            <input type="text" id="inputVendor" placeholder="Kimia Farma" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                        </div>
+                        <div class="flex items-center mt-2">
+                            <input type="checkbox" id="inputKronis" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 mr-2">
+                            <label class="text-sm font-medium text-gray-700">Termasuk Obat Kronis</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="p-4 border-t flex justify-end gap-2 bg-gray-50 rounded-b-2xl">
+                <button onclick="closeModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-white transition font-medium">Batal</button>
+                <button type="submit" form="formObat" id="btnSimpan" class="px-6 py-2 bg-rsud text-white rounded-lg font-semibold hover:bg-emerald-700 transition">Simpan Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://liyjnpjawjkobopwuhnb.supabase.co';
+        // ⚠️ GANTI DENGAN PUBLISHABLE KEY BARU ANDA
+        const SUPABASE_ANON_KEY = 'sb_publishable_1ia1Sofbm9IFgO3cQbeiPw_KNslUtii'; 
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let allData = [];
+        let filteredData = [];
+        let userRole = '';
+
+        async function checkAuth() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) { window.location.href = 'index.html'; return; }
+            
+            const { data: profile } = await supabaseClient.from('users').select('role').eq('id', session.user.id).single();
+            if (profile) {
+                userRole = profile.role;
+                // Sembunyikan tombol tambah jika bukan role yang berhak (opsional, RLS sudah melindungi)
+                if (!['admin_ksm', 'anggota_pft', 'ketua_pft'].includes(userRole)) {
+                    document.getElementById('btnTambah').style.display = 'none';
+                }
+            }
+            fetchData();
+        }
+
+        async function fetchData() {
+            const tbody = document.getElementById('tableBody');
+            let skeleton = '';
+            for(let i=0; i<5; i++) skeleton += `<tr><td colspan="8" class="p-3"><div class="h-4 bg-gray-200 rounded skeleton w-full"></div></td></tr>`;
+            tbody.innerHTML = skeleton;
+
+            const { data, error } = await supabaseClient.from('master_obat').select('*').order('nama_generik', { ascending: true });
+            
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-red-500">Gagal memuat data: ${error.message}</td></tr>`;
+                return;
+            }
+            allData = data || [];
+            applyFilter();
+        }
+
+        function applyFilter() {
+            const keyword = document.getElementById('searchObat').value.toLowerCase();
+            const kelompok = document.getElementById('filterKelompok').value;
+            const status = document.getElementById('filterStatus').value;
+
+            filteredData = allData.filter(item => {
+                const matchSearch = item.nama_generik.toLowerCase().includes(keyword) || (item.nama_dagang && item.nama_dagang.toLowerCase().includes(keyword));
+                const matchKelompok = kelompok ? item.kelompok_obat === kelompok : true;
+                let matchStatus = true;
+                if (status === 'aktif') matchStatus = item.is_active === true;
+                if (status === 'nonaktif') matchStatus = item.is_active === false;
+
+                return matchSearch && matchKelompok && matchStatus;
+            });
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const info = document.getElementById('infoJumlah');
+            
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400">Tidak ada data obat yang cocok.</td></tr>`;
+                info.textContent = `Menampilkan 0 data`;
+                return;
+            }
+
+            tbody.innerHTML = filteredData.map(item => {
+                const badgeStatus = item.is_active 
+                    ? `<span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">✅ Aktif</span>`
+                    : `<span class="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">❌ Non-Aktif</span>`;
+                
+                const badgeJaminan = item.status_jaminan === 'Fornas' 
+                    ? `<span class="text-xs font-semibold text-blue-600 border border-blue-600 px-2 py-0.5 rounded">Fornas</span>`
+                    : `<span class="text-xs text-gray-500 border border-gray-400 px-2 py-0.5 rounded">Non-Fornas</span>`;
+
+                return `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="p-3 font-mono text-xs text-gray-500">${item.kode_obat || '-'}</td>
+                        <td class="p-3">
+                            <div class="font-bold text-gray-800">${item.nama_generik}</div>
+                            <div class="text-xs text-gray-500">${item.nama_dagang || ''}</div>
+                        </td>
+                        <td class="p-3">${item.kelompok_obat}</td>
+                        <td class="p-3">${item.bentuk_sediaan} ${item.kekuatan_dosis ? `(${item.kekuatan_dosis})` : ''}</td>
+                        <td class="p-3">${item.kategori_obat}</td>
+                        <td class="p-3">${badgeJaminan}</td>
+                        <td class="p-3">${badgeStatus}</td>
+                        <td class="p-3 flex gap-2">
+                            <button onclick="editObat('${item.id}')" class="text-blue-600 hover:underline text-xs font-semibold">Edit</button>
+                            ${item.is_active 
+                                ? `<button onclick="toggleStatus('${item.id}', false)" class="text-red-500 hover:underline text-xs font-semibold">Hapus</button>`
+                                : `<button onclick="toggleStatus('${item.id}', true)" class="text-green-600 hover:underline text-xs font-semibold">Pulihkan</button>`
+                            }
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            info.textContent = `Menampilkan ${filteredData.length} data formularium`;
+        }
+
+        // Modal Logic
+        function openModal() {
+            document.getElementById('formObat').reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('modalTitle').textContent = 'Tambah Obat Baru';
+            document.getElementById('modalForm').classList.remove('hidden');
+        }
+
+        function closeModal() { document.getElementById('modalForm').classList.add('hidden'); }
+
+        document.getElementById('btnTambah').addEventListener('click', openModal);
+
+        function editObat(id) {
+            const item = allData.find(d => d.id === id);
+            if (!item) return;
+
+            document.getElementById('editId').value = item.id;
+            document.getElementById('inputKode').value = item.kode_obat || '';
+            document.getElementById('inputNamaGenerik').value = item.nama_generik;
+            document.getElementById('inputNamaDagang').value = item.nama_dagang || '';
+            document.getElementById('inputKelompok').value = item.kelompok_obat;
+            document.getElementById('inputSediaan').value = item.bentuk_sediaan;
+            document.getElementById('inputDosis').value = item.kekuatan_dosis || '';
+            document.getElementById('inputKategori').value = item.kategori_obat;
+            document.getElementById('inputJaminan').value = item.status_jaminan;
+            document.getElementById('inputVendor').value = item.vendor_utama || '';
+            document.getElementById('inputKronis').checked = item.is_kronis;
+
+            document.getElementById('modalTitle').textContent = 'Edit Data Obat';
+            document.getElementById('modalForm').classList.remove('hidden');
+        }
+
+        // Simpan Data (Insert / Update)
+        document.getElementById('formObat').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSimpan');
+            btn.textContent = 'Menyimpan...';
+            btn.disabled = true;
+
+            const editId = document.getElementById('editId').value;
+            const payload = {
+                kode_obat: document.getElementById('inputKode').value || null,
+                nama_generik: document.getElementById('inputNamaGenerik').value,
+                nama_dagang: document.getElementById('inputNamaDagang').value || null,
+                kelompok_obat: document.getElementById('inputKelompok').value,
+                bentuk_sediaan: document.getElementById('inputSediaan').value,
+                kekuatan_dosis: document.getElementById('inputDosis').value || null,
+                kategori_obat: document.getElementById('inputKategori').value,
+                status_jaminan: document.getElementById('inputJaminan').value,
+                vendor_utama: document.getElementById('inputVendor').value || null,
+                is_kronis: document.getElementById('inputKronis').checked
+            };
+
+            let error;
+            if (editId) {
+                const { error: err } = await supabaseClient.from('master_obat').update(payload).eq('id', editId);
+                error = err;
+            } else {
+                payload.is_active = true;
+                const { error: err } = await supabaseClient.from('master_obat').insert([payload]);
+                error = err;
+            }
+
+            btn.textContent = 'Simpan Data';
+            btn.disabled = false;
+
+            if (error) {
+                alert('Gagal menyimpan: ' + error.message);
+            } else {
+                alert('Data berhasil disimpan!');
+                closeModal();
+                fetchData();
+            }
+        });
+
+        // Soft Delete / Restore
+        async function toggleStatus(id, newStatus) {
+            const action = newStatus ? 'memulihkan' : 'menonaktifkan (soft delete)';
+            if (!confirm(`Apakah Anda yakin ingin ${action} obat ini?`)) return;
+
+            const { error } = await supabaseClient.from('master_obat').update({ is_active: newStatus }).eq('id', id);
+            if (error) {
+                alert('Gagal update status: ' + error.message);
+            } else {
+                fetchData();
+            }
+        }
+
+        // Event Listeners for Filters
+        document.getElementById('searchObat').addEventListener('input', applyFilter);
+        document.getElementById('filterKelompok').addEventListener('change', applyFilter);
+        document.getElementById('filterStatus').addEventListener('change', applyFilter);
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await supabaseClient.auth.signOut();
+            window.location.href = 'index.html';
+        });
+
+        checkAuth();
+    </script>
+</body>
+</html>
