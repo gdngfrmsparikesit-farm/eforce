@@ -257,7 +257,8 @@
                         <td class="p-3">${item.kategori_obat}</td>
                         <td class="p-3">${badgeJaminan}</td>
                         <td class="p-3">${badgeStatus}</td>
-                        <td class="p-3 flex gap-2">
+                        <td class="p-3 flex gap-3 items-center">
+                            <a href="detail_obat.html?id=${item.id}" class="text-emerald-600 hover:underline text-xs font-bold bg-emerald-50 px-2 py-1 rounded">👁️ Detail</a>
                             <button onclick="editObat('${item.id}')" class="text-blue-600 hover:underline text-xs font-semibold">Edit</button>
                             ${item.is_active 
                                 ? `<button onclick="toggleStatus('${item.id}', false)" class="text-red-500 hover:underline text-xs font-semibold">Hapus</button>`
