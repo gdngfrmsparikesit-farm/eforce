@@ -7,12 +7,42 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    
+    <!-- TOM SELECT CSS & JS -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+
     <style>
         .bg-rsud { background-color: #059669; }
         .text-rsud { color: #059669; }
         .border-rsud { border-color: #059669; }
         .step-active { background-color: #059669; color: white; border-color: #059669; }
         .step-inactive { background-color: white; color: #9ca3af; border-color: #e5e7eb; }
+        
+        /* CUSTOMISASI TOM SELECT AGAR SESUAI TAILWIND */
+        .ts-wrapper.single .ts-control {
+            background-color: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.625rem 1rem;
+            font-size: 1rem;
+            color: #374151;
+        }
+        .ts-wrapper.focus .ts-control {
+            box-shadow: 0 0 0 2px #10b981;
+            border-color: #10b981;
+            outline: none;
+        }
+        .ts-dropdown {
+            border-radius: 0.5rem;
+            border: 1px solid #d1d5db;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            font-size: 0.95rem;
+        }
+        .ts-dropdown .option.active {
+            background-color: #ecfdf5;
+            color: #047857;
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
@@ -76,13 +106,15 @@
                     <input type="date" id="tanggalPengajuan" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
 
+                <!-- SEARCHABLE DROPDOWN TOM SELECT -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Obat (Formularium) <span class="text-red-500">*</span></label>
-                    <select id="pilihObat" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
+                    <select id="pilihObat" placeholder="Ketik nama obat untuk mencari..." required>
                         <option value="">Memuat data obat...</option>
                     </select>
-                    <p class="text-xs text-gray-500 mt-1">Hanya obat yang terdaftar di Formularium yang bisa diajukan.</p>
+                    <p class="text-xs text-gray-500 mt-1">Ketik nama generik atau nama dagang (contoh: "paracetamol", "sanmol").</p>
                 </div>
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">EBM & PPK/Konsensus <span class="text-red-500">*</span></label>
                     <div id="ebmContainer" class="border border-gray-200 rounded-lg p-3 md:p-4 space-y-3 bg-gray-50"></div>
@@ -126,6 +158,7 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUserProfile = null;
+        let tomSelectInstance = null; // Variabel untuk menyimpan instance Tom Select
 
         async function checkAuth() {
             const { data: { session } } = await supabaseClient.auth.getSession();
@@ -137,14 +170,14 @@
             document.getElementById('tanggalPengajuan').valueAsDate = new Date();
             tambahBarisEbm();
             
-            // TAMBAHKAN BARIS INI UNTUK MEMUAT DATA OBAT
+            // Panggil fungsi loadMasterObat
             loadMasterObat(); 
         }
 
-        // FUNGSI BARU UNTUK MENGAMBIL DATA DARI MASTER OBAT
         async function loadMasterObat() {
             const select = document.getElementById('pilihObat');
-            // Hanya ambil obat yang is_active = true (belum dihapus)
+            
+            // Hanya ambil obat yang aktif
             const { data, error } = await supabaseClient
                 .from('master_obat')
                 .select('id, nama_generik, nama_dagang, bentuk_sediaan, kekuatan_dosis')
@@ -161,14 +194,26 @@
                 return;
             }
 
-            select.innerHTML = '<option value="">-- Pilih Obat --</option>' + data.map(obat => {
-                // Format tampilan: Paracetamol (Sanmol) - Tablet 500mg
+            // Isi <select> dengan data dari Supabase
+            select.innerHTML = '<option value="">-- Ketik / Pilih Obat --</option>' + data.map(obat => {
+                // Format: Paracetamol (Sanmol) - Tablet 500mg
                 let label = obat.nama_generik;
                 if (obat.nama_dagang) label += ` (${obat.nama_dagang})`;
                 label += ` - ${obat.bentuk_sediaan} ${obat.kekuatan_dosis || ''}`;
                 
                 return `<option value="${obat.id}" data-nama="${obat.nama_generik}">${label}</option>`;
             }).join('');
+
+            // INISIALISASI TOM SELECT SETELAH DATA MASUK
+            tomSelectInstance = new TomSelect("#pilihObat", {
+                create: false,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                },
+                maxOptions: 50, // Batasi tampilan agar tidak lag saat drop down dibuka (pencarian tetap berjalan)
+                placeholder: "Cari nama obat (misal: Paracetamol)..."
+            });
         }
 
         function tambahBarisEbm() {
@@ -220,11 +265,10 @@
                 return;
             }
 
-            const pilihObat = document.getElementById('pilihObat');
-            const selectedOption = pilihObat.options[pilihObat.selectedIndex];
+            // AMBIL NILAI DARI TOM SELECT
+            const selectedObatId = tomSelectInstance.getValue();
             
-            // Validasi apakah user sudah memilih obat
-            if (!pilihObat.value) {
+            if (!selectedObatId) {
                 errorMsg.textContent = 'Silakan pilih obat dari daftar formularium.';
                 errorMsg.classList.remove('hidden');
                 btn.textContent = 'Submit';
@@ -232,10 +276,13 @@
                 return;
             }
 
+            // Ambil nama obat dari atribut data-nama pada option yang dipilih
+            const selectedObatNama = tomSelectInstance.getOption(selectedObatId).dataset.nama;
+
             const payload = {
                 p_tanggal: document.getElementById('tanggalPengajuan').value,
-                p_nama_obat: selectedOption.getAttribute('data-nama'), // Ambil nama dari atribut data-nama
-                p_master_obat_id: pilihObat.value, // Kirim ID obatnya
+                p_nama_obat: selectedObatNama, // Nama generik
+                p_master_obat_id: selectedObatId, // ID obat
                 p_ebm_ppk: ebmData,
                 p_alasan: document.getElementById('alasanPengajuan').value,
                 p_pemberi_persetujuan: document.getElementById('pemberiPersetujuan').value
