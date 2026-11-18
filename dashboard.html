@@ -25,11 +25,6 @@
         }
     </style>
 </head>
-<!-- 
-    PERUBAHAN PENTING DI SINI:
-    Di HP: scroll normal (min-h-screen flex flex-col).
-    Di Desktop (md): dikunci tingginya (md:h-screen md:overflow-hidden) agar hanya tabel yang scroll.
--->
 <body class="bg-gray-50 font-sans min-h-screen flex flex-col md:h-screen md:overflow-hidden">
 
     <!-- Header -->
@@ -43,7 +38,6 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="flex-1 flex flex-col md:overflow-hidden">
         
         <!-- Bagian Atas (Filter, Stat, Tombol) -->
@@ -125,25 +119,30 @@
                 </div>
             </div>
 
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-2">
-            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                <button id="ajukanBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition flex justify-center items-center gap-2">
-                    <span>+</span> Ajukan Obat Baru
-                </button>
-                <!-- TOMBOL MASTER OBAT BARU -->
-                <button id="masterObatBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-rsud px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-50 transition flex justify-center items-center gap-2 shadow-sm">
-                    <span>📚</span> Master Obat
-                </button>
+            <!-- Tombol Aksi -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-2">
+                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <button id="ajukanBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition flex justify-center items-center gap-2">
+                        <span>+</span> Ajukan Obat Baru
+                    </button>
+                    <!-- TOMBOL MASTER OBAT -->
+                    <button id="masterObatBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-rsud px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-50 transition flex justify-center items-center gap-2 shadow-sm">
+                        <span>⚙️</span> Master Obat
+                    </button>
+                    <!-- TOMBOL FORMULARIUM OBAT -->
+                    <button id="kamusObatBtn" class="w-full sm:w-auto bg-emerald-50 border border-emerald-300 text-emerald-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-100 transition flex justify-center items-center gap-2 shadow-sm">
+                        <span>📚</span> Formularium Obat
+                    </button>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <button id="printBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition flex justify-center items-center gap-2">
+                        <span>🖨️</span> Cetak PDF
+                    </button>
+                    <button id="exportBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition flex justify-center items-center gap-2">
+                        <span>⬇</span> Download Excel
+                    </button>
+                </div>
             </div>
-            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                <button id="printBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition flex justify-center items-center gap-2">
-                    <span>🖨️</span> Cetak PDF
-                </button>
-                <button id="exportBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition flex justify-center items-center gap-2">
-                    <span>⬇</span> Download Excel
-                </button>
-            </div>
-        </div>
 
             <div id="infoJumlah" class="text-xs text-gray-500 mb-2"></div>
         </div>
@@ -543,6 +542,10 @@
         document.getElementById('logoutBtn').addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; });
         document.getElementById('ajukanBtn').addEventListener('click', () => { window.location.href = 'pengajuan.html'; });
         document.getElementById('masterObatBtn').addEventListener('click', () => { window.location.href = 'master_obat.html'; });
+        
+        // Event Listener untuk Formularium Obat
+        document.getElementById('kamusObatBtn').addEventListener('click', () => { window.location.href = 'kamus_obat.html'; });
+        
         document.getElementById('searchBtn').addEventListener('click', () => { currentPage = 1; applyTabFilter(); });
         document.getElementById('resetFilter').addEventListener('click', resetFilter);
         document.getElementById('exportBtn').addEventListener('click', exportExcel);
