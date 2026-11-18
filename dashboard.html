@@ -125,20 +125,25 @@
                 </div>
             </div>
 
-            <!-- Tombol Aksi -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-2">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-2">
+            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                 <button id="ajukanBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition flex justify-center items-center gap-2">
                     <span>+</span> Ajukan Obat Baru
                 </button>
-                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <button id="printBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition flex justify-center items-center gap-2">
-                        <span>🖨️</span> Cetak PDF
-                    </button>
-                    <button id="exportBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition flex justify-center items-center gap-2">
-                        <span>⬇</span> Download Excel
-                    </button>
-                </div>
+                <!-- TOMBOL MASTER OBAT BARU -->
+                <button id="masterObatBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-rsud px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-50 transition flex justify-center items-center gap-2 shadow-sm">
+                    <span>📚</span> Master Obat
+                </button>
             </div>
+            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <button id="printBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition flex justify-center items-center gap-2">
+                    <span>🖨️</span> Cetak PDF
+                </button>
+                <button id="exportBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition flex justify-center items-center gap-2">
+                    <span>⬇</span> Download Excel
+                </button>
+            </div>
+        </div>
 
             <div id="infoJumlah" class="text-xs text-gray-500 mb-2"></div>
         </div>
