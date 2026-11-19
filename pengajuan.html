@@ -49,7 +49,6 @@
 <body class="bg-gray-50 font-sans">
 
     <header class="bg-white shadow-sm border-b sticky top-0 z-10">
-        <!-- Diperlebar ke max-w-5xl agar proporsional dengan form 2 kolom -->
         <div class="w-full max-w-[95%] 2xl:max-w-[1600px] mx-auto px-4 py-3 flex justify-between items-center">
             <div class="h-10 w-32 bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs font-semibold">RSUD AMP</div>
             <div class="flex items-center gap-2 md:gap-3">
@@ -59,7 +58,6 @@
         </div>
     </header>
 
-    <!-- Main Container Diperlebar -->
     <main class="w-full max-w-[95%] 2xl:max-w-[1600px] mx-auto px-4 py-6 md:py-8">
 
         <nav class="text-sm text-gray-500 mb-3">
@@ -101,51 +99,87 @@
         </div>
 
         <div class="bg-white rounded-2xl border border-emerald-200 shadow-sm p-4 md:p-8">
-            <h1 class="text-xl md:text-2xl font-bold text-rsud text-center mb-6 md:mb-8">Pengajuan Pengadaan Reguler</h1>
+            <h1 class="text-xl md:text-2xl font-bold text-rsud text-center mb-6 md:mb-8">Formulir Pengajuan Obat</h1>
 
-            <!-- FORM GRID 2 KOLOM -->
             <form id="pengajuanForm" class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-10">
                 
                 <!-- ================= KOLOM KIRI ================= -->
-                <div class="space-y-6">
+                <div class="space-y-5">
                     <!-- Tanggal Pengajuan -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Pengajuan <span class="text-red-500">*</span></label>
                         <input type="date" id="tanggalPengajuan" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
                     </div>
 
-                    <!-- Pilih Obat -->
+                    <!-- Pilih Obat Generik -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Obat (Formularium) <span class="text-red-500">*</span></label>
-                        <select id="pilihObat" placeholder="Ketik nama obat untuk mencari..." required>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Obat Generik (Formularium) <span class="text-red-500">*</span></label>
+                        <select id="pilihObat" placeholder="Ketik nama generik untuk mencari..." required>
                             <option value="">Memuat data obat...</option>
                         </select>
-                        <p class="text-xs text-gray-500 mt-1">Ketik nama generik atau nama dagang (contoh: "paracetamol", "sanmol").</p>
                     </div>
 
-                    <!-- EBM & PPK/Konsensus -->
+                    <!-- Nama Obat Paten (Opsional) -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">EBM & PPK/Konsensus <span class="text-red-500">*</span></label>
-                        <div id="ebmContainer" class="border border-gray-200 rounded-lg p-3 md:p-4 space-y-3 bg-gray-50"></div>
-                        <button type="button" id="tambahEbmBtn" class="mt-3 bg-rsud text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-emerald-700 transition flex items-center gap-1">
-                            <span>+</span> Tambah Baris
-                        </button>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Obat Paten / Dagang</label>
+                        <input type="text" id="namaPatenManual" placeholder="Contoh: Sanmol, Pamol (Kosongkan jika tidak ada)" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                        <p class="text-xs text-gray-500 mt-1">Diisi jika mengajukan obat bermerek/paten spesifik.</p>
+                    </div>
+
+                    <!-- Obat Sebelumnya -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Obat Sebelumnya (Riwayat)</label>
+                        <input type="text" id="obatSebelumnya" placeholder="Obat yang digunakan sebelumnya untuk diagnosis ini..." class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
                     </div>
                 </div>
 
                 <!-- ================= KOLOM KANAN ================= -->
-                <div class="space-y-6 flex flex-col h-full">
-                    <!-- Alasan Pengajuan -->
-                    <div class="flex-1">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Alasan Pengajuan <span class="text-red-500">*</span></label>
-                        <textarea id="alasanPengajuan" required rows="6" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none resize-none h-32 md:h-40"></textarea>
+                <div class="space-y-5">
+                    <!-- Alasan Pengajuan (Checkbox) -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Alasan Pengajuan <span class="text-red-500">*</span></label>
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-2">
+                            <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 p-1 rounded">
+                                <input type="checkbox" value="Obat Pengganti" class="alasan-checkbox w-4 h-4 text-emerald-600 rounded">
+                                Obat pengganti (jika dibandingkan dengan yang sudah tersedia)
+                            </label>
+                            <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 p-1 rounded">
+                                <input type="checkbox" value="Obat Baru" class="alasan-checkbox w-4 h-4 text-emerald-600 rounded">
+                                Untuk obat baru (belum ada di Formularium)
+                            </label>
+                            <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 p-1 rounded">
+                                <input type="checkbox" value="Obat Kombinasi" class="alasan-checkbox w-4 h-4 text-emerald-600 rounded">
+                                Untuk obat kombinasi
+                            </label>
+                        </div>
+                        <input type="text" id="alasanTambahan" placeholder="Tambahkan penjelasan singkat..." class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                    </div>
+
+                    <!-- Kebutuhan 1 Bulan -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Estimasi Kebutuhan 1 Bulan</label>
+                        <input type="text" id="kebutuhanBulan" placeholder="Contoh: 1000 Tablet / 50 Box" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+
+                    <!-- EBM, PPK, HTA (Links) -->
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4 space-y-3">
+                        <label class="block text-sm font-bold text-emerald-800">Kelengkapan Dokumen (Link URL)</label>
+                        <div id="ebmContainer" class="space-y-2"></div>
+                        <button type="button" id="tambahEbmBtn" class="text-xs bg-white border border-emerald-300 text-emerald-700 px-3 py-1.5 rounded hover:bg-emerald-100 transition">
+                            + Tambah Baris
+                        </button>
+                        
+                        <div class="pt-2 border-t border-emerald-200 mt-2">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Link HTA (Health Technology Assessment)</label>
+                            <input type="url" id="linkHta" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                        </div>
                     </div>
 
                     <!-- Pemberi Persetujuan -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Pemberi Persetujuan <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Pemberi Persetujuan <span class="text-red-500">*</span></label>
                         <select id="pemberiPersetujuan" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
-                            <option value="">-- Pilih Pemberi Persetujuan --</option>
+                            <option value="">-- Pilih KSM yang Dituju --</option>
                             <option value="Ketua KSM Jantung">Ketua KSM Jantung</option>
                             <option value="Ketua KSM Saraf dan Jiwa">Ketua KSM Saraf dan Jiwa</option>
                             <option value="Ketua KSM Bedah Gigi & Mulut">Ketua KSM Bedah Gigi & Mulut</option>
@@ -157,15 +191,15 @@
                         </select>
                     </div>
 
-                    <!-- Submit Button (Posisi di bawah kanan) -->
-                    <div class="pt-4 mt-auto">
+                    <!-- Submit Button -->
+                    <div class="pt-4">
                         <button type="submit" id="submitBtn" class="w-full bg-rsud text-white font-semibold py-3.5 rounded-xl hover:bg-emerald-700 transition shadow-md text-lg">
                             Kirim Pengajuan
                         </button>
                     </div>
                 </div>
 
-                <!-- Error Message (Membentang di bawah jika ada error) -->
+                <!-- Error Message -->
                 <div class="lg:col-span-2">
                     <p id="errorMsg" class="text-red-500 text-sm text-center hidden font-semibold bg-red-50 p-3 rounded-lg border border-red-200"></p>
                 </div>
@@ -208,48 +242,40 @@
                 return;
             }
 
-            if (data.length === 0) {
-                select.innerHTML = `<option value="">Belum ada data obat di Formularium</option>`;
-                return;
-            }
-
-            select.innerHTML = '<option value="">-- Ketik / Pilih Obat --</option>' + data.map(obat => {
+            select.innerHTML = '<option value="">-- Ketik / Pilih Obat Generik --</option>' + data.map(obat => {
                 let label = obat.nama_generik;
                 if (obat.nama_dagang) label += ` (${obat.nama_dagang})`;
                 label += ` - ${obat.bentuk_sediaan} ${obat.kekuatan_dosis || ''}`;
-                return `<option value="${obat.id}" data-nama="${obat.nama_generik}">${label}</option>`;
+                return `<option value="${obat.id}" data-nama="${obat.nama_generik}" data-dagang="${obat.nama_dagang || ''}">${label}</option>`;
             }).join('');
 
             tomSelectInstance = new TomSelect("#pilihObat", {
                 create: false,
                 sortField: { field: "text", direction: "asc" },
                 maxOptions: 50,
-                placeholder: "Ketik nama obat...",
-                dropdownParent: 'body' // Mencegah dropdown terpotong oleh overflow form
+                placeholder: "Ketik nama obat generik...",
+                dropdownParent: 'body'
             });
         }
 
         function tambahBarisEbm() {
             const container = document.getElementById('ebmContainer');
             const row = document.createElement('div');
-            row.className = 'ebm-row flex flex-col gap-2 relative border-b border-gray-200 pb-3 mb-3 last:border-0 last:pb-0 last:mb-0';
+            row.className = 'ebm-row flex flex-col gap-2 relative border-b border-gray-200 pb-2 mb-2 last:border-0 last:pb-0 last:mb-0';
             row.innerHTML = `
                 <div class="flex gap-2">
-                    <select class="ebm-tipe px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none w-1/3">
+                    <select class="ebm-tipe px-2 py-1.5 border border-gray-300 rounded text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none w-28">
                         <option value="EBM">EBM</option>
                         <option value="PPK">PPK</option>
-                        <option value="Konsensus">Konsensus</option>
+                        <option value="CP">CP</option>
                     </select>
-                    <input type="text" class="ebm-nama flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Nama (contoh: EBM Vita)">
-                </div>
-                <div class="flex gap-2 items-center">
-                    <input type="text" class="ebm-link flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Link (opsional)">
-                    <button type="button" class="hapus-ebm text-red-500 hover:text-red-700 p-2 bg-red-50 rounded-lg" title="Hapus">🗑</button>
+                    <input type="url" class="ebm-link flex-1 px-2 py-1.5 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Link URL Dokumen...">
+                    <button type="button" class="hapus-ebm text-red-500 hover:text-red-700 p-1.5 bg-red-50 rounded" title="Hapus">🗑</button>
                 </div>
             `;
             row.querySelector('.hapus-ebm').addEventListener('click', () => {
                 if (container.querySelectorAll('.ebm-row').length > 1) row.remove();
-                else alert('Minimal harus ada 1 baris EBM/PPK.');
+                else alert('Minimal harus ada 1 baris dokumen.');
             });
             container.appendChild(row);
         }
@@ -265,25 +291,30 @@
             btn.disabled = true;
             errorMsg.classList.add('hidden');
 
-            const ebmRows = document.querySelectorAll('.ebm-row');
-            const ebmData = [];
-            ebmRows.forEach(row => {
-                const tipe = row.querySelector('.ebm-tipe').value;
-                const nama = row.querySelector('.ebm-nama').value.trim();
-                const link = row.querySelector('.ebm-link').value.trim();
-                if (nama) ebmData.push({ tipe, nama, link });
-            });
-
-            if (ebmData.length === 0) {
-                errorMsg.textContent = 'Minimal isi 1 nama EBM/PPK/Konsensus.';
+            // 1. Ambil Data Checkbox Alasan
+            const alasanCheckboxes = document.querySelectorAll('.alasan-checkbox:checked');
+            const alasanTipe = Array.from(alasanCheckboxes).map(cb => cb.value);
+            const alasanTambahan = document.getElementById('alasanTambahan').value.trim();
+            
+            if (alasanTipe.length === 0 && alasanTambahan === '') {
+                errorMsg.textContent = 'Pilih minimal satu alasan pengajuan atau isi keterangan tambahan.';
                 errorMsg.classList.remove('hidden');
                 btn.textContent = 'Kirim Pengajuan';
                 btn.disabled = false;
                 return;
             }
 
+            // 2. Ambil Data EBM
+            const ebmRows = document.querySelectorAll('.ebm-row');
+            const ebmData = [];
+            ebmRows.forEach(row => {
+                const tipe = row.querySelector('.ebm-tipe').value;
+                const link = row.querySelector('.ebm-link').value.trim();
+                if (link) ebmData.push({ tipe, link });
+            });
+
+            // 3. Ambil Data Obat
             const selectedObatId = tomSelectInstance.getValue();
-            
             if (!selectedObatId) {
                 errorMsg.textContent = 'Silakan pilih obat dari daftar formularium.';
                 errorMsg.classList.remove('hidden');
@@ -291,18 +322,24 @@
                 btn.disabled = false;
                 return;
             }
-
             const selectedObatNama = tomSelectInstance.getOption(selectedObatId).dataset.nama;
 
+            // 4. Susun Payload
             const payload = {
                 p_tanggal: document.getElementById('tanggalPengajuan').value,
                 p_nama_obat: selectedObatNama,
                 p_master_obat_id: selectedObatId,
+                p_nama_paten_manual: document.getElementById('namaPatenManual').value.trim(),
                 p_ebm_ppk: ebmData,
-                p_alasan: document.getElementById('alasanPengajuan').value,
+                p_link_hta: document.getElementById('linkHta').value.trim(),
+                p_alasan_tipe: alasanTipe,
+                p_alasan: alasanTambahan,
+                p_obat_sebelumnya: document.getElementById('obatSebelumnya').value.trim(),
+                p_kebutuhan_1_bulan: document.getElementById('kebutuhanBulan').value.trim(),
                 p_pemberi_persetujuan: document.getElementById('pemberiPersetujuan').value
             };
 
+            // 5. Kirim ke Supabase
             const { data, error } = await supabaseClient.rpc('submit_pengajuan', payload);
 
             if (error) {
