@@ -231,11 +231,29 @@
         async function loadMasterObat() {
             const select = document.getElementById('pilihObat');
             
-            const { data, error } = await supabaseClient
+            // Dapatkan lokasi user
+            const lokasiUser = currentUserProfile.lokasi_gedung || 'Utama';
+            
+            // 1. Siapkan query dasar (belum dijalankan)
+            let query = supabaseClient
                 .from('master_obat')
                 .select('id, nama_generik, nama_dagang, bentuk_sediaan, kekuatan_dosis')
-                .eq('is_active', true)
-                .order('nama_generik', { ascending: true });
+                .eq('is_active', true);
+
+            // 2. Tambahkan filter berdasarkan lokasi user
+            if (lokasiUser === 'Paviliun') {
+                query = query.in('lokasi_gedung', ['Paviliun', 'Keduanya']);
+            } else {
+                query = query.in('lokasi_gedung', ['Utama', 'Keduanya']);
+            }
+
+            // 3. Jalankan query dan ambil datanya
+            const { data, error } = await query.order('nama_generik', { ascending: true });
+
+            if (error) {
+                select.innerHTML = `<option value="">Gagal memuat obat: ${error.message}</option>`;
+                return;
+            }
 
             if (error) {
                 select.innerHTML = `<option value="">Gagal memuat obat: ${error.message}</option>`;
