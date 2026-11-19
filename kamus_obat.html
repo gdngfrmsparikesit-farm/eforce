@@ -43,7 +43,7 @@
             font-weight: bold;
         }
         
-        /* Animasi Fade In untuk Detail */
+        /* Animasi Fade In */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
     </style>
@@ -64,26 +64,81 @@
         </div>
     </header>
 
-    <main class="w-full max-w-4xl mx-auto px-4 py-8 md:py-12">
+    <main class="w-full max-w-5xl mx-auto px-4 py-8 md:py-10">
         
-        <!-- Bagian Pencarian (Hero) -->
-        <div class="text-center mb-8">
-            <h1 class="text-2xl md:text-4xl font-bold text-emerald-800 mb-3 uppercase tracking-wide">📚 Formularium Obat RSUD AM Parikesit</h1>
+        <!-- Hero Title -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl md:text-4xl font-bold text-emerald-800 mb-2 uppercase tracking-wide">📚 Formularium Obat RSUD AM Parikesit</h1>
             <p class="text-gray-500 max-w-2xl mx-auto">Pusat informasi obat. Ketik nama generik atau nama dagang untuk melihat rincian, restriksi, dan status jaminan secara instan.</p>
         </div>
 
+        <!-- PANEL STATISTIK (FITUR BARU) -->
+        <div id="statistikPanel" class="mb-8">
+            <!-- Skeleton Loading untuk Statistik -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 animate-pulse">
+                <div class="bg-gray-200 h-24 rounded-xl"></div>
+                <div class="bg-gray-200 h-24 rounded-xl"></div>
+                <div class="bg-gray-200 h-24 rounded-xl"></div>
+                <div class="bg-gray-200 h-24 rounded-xl"></div>
+                <div class="bg-gray-200 h-24 rounded-xl hidden md:block"></div>
+                <div class="bg-gray-200 h-24 rounded-xl hidden md:block"></div>
+                <div class="bg-gray-200 h-24 rounded-xl hidden md:block"></div>
+                <div class="bg-gray-200 h-24 rounded-xl hidden md:block"></div>
+            </div>
+            
+            <!-- Kontainer Data Asli (Disembunyikan dulu) -->
+            <div id="statistikData" class="hidden grid grid-cols-2 md:grid-cols-4 gap-3">
+                <!-- Total & Status Aktif -->
+                <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm flex flex-col justify-center">
+                    <div class="text-xs text-gray-500 font-semibold mb-1 flex items-center gap-1"><span>💊</span> Total Item</div>
+                    <div class="text-2xl font-bold text-gray-800" id="statTotal">-</div>
+                </div>
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 shadow-sm flex flex-col justify-center">
+                    <div class="text-xs text-emerald-700 font-semibold mb-1 flex items-center gap-1"><span>✅</span> Obat Aktif</div>
+                    <div class="text-2xl font-bold text-emerald-700" id="statAktif">-</div>
+                </div>
+                <div class="bg-red-50 border border-red-200 rounded-xl p-3 shadow-sm flex flex-col justify-center">
+                    <div class="text-xs text-red-700 font-semibold mb-1 flex items-center gap-1"><span>❌</span> Non-Aktif</div>
+                    <div class="text-2xl font-bold text-red-700" id="statNonAktif">-</div>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm flex flex-col justify-center">
+                    <div class="text-xs text-gray-500 font-semibold mb-1 flex items-center gap-1"><span>🏥</span> Kelompok</div>
+                    <div class="text-2xl font-bold text-gray-800" id="statKelompok">-</div>
+                </div>
+
+                <!-- Jaminan & Kronis -->
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 shadow-sm flex flex-col justify-center">
+                    <div class="text-xs text-blue-700 font-semibold mb-1 flex items-center gap-1"><span>💳</span> Fornas (BPJS)</div>
+                    <div class="text-2xl font-bold text-blue-700" id="statFornas">-</div>
+                </div>
+                <div class="bg-gray-100 border border-gray-300 rounded-xl p-3 shadow-sm flex flex-col justify-center">
+                    <div class="text-xs text-gray-600 font-semibold mb-1 flex items-center gap-1"><span>💵</span> Non-Fornas</div>
+                    <div class="text-2xl font-bold text-gray-700" id="statNonFornas">-</div>
+                </div>
+                <div class="bg-orange-50 border border-orange-200 rounded-xl p-3 shadow-sm flex flex-col justify-center">
+                    <div class="text-xs text-orange-700 font-semibold mb-1 flex items-center gap-1"><span>❤️</span> Obat Kronis</div>
+                    <div class="text-2xl font-bold text-orange-700" id="statKronis">-</div>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm flex flex-col justify-center">
+                    <div class="text-xs text-gray-500 font-semibold mb-1 flex items-center gap-1"><span>📦</span> Sediaan</div>
+                    <div class="text-2xl font-bold text-gray-800" id="statSediaan">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kolom Pencarian -->
         <div class="mb-10 shadow-lg rounded-2xl">
             <select id="pencarianObat" placeholder="Ketik nama obat... (contoh: Paracetamol, Ceftriaxone)"></select>
         </div>
 
-        <!-- Empty State (Tampil saat belum ada obat yang dipilih) -->
+        <!-- Empty State -->
         <div id="emptyState" class="text-center py-16 bg-white rounded-3xl border border-gray-200 shadow-sm">
             <div class="text-6xl mb-4 opacity-50">💊</div>
             <h3 class="text-xl font-semibold text-gray-700 mb-2">Belum Ada Obat yang Dipilih</h3>
             <p class="text-gray-500">Silakan gunakan kolom pencarian di atas untuk melihat detail obat.</p>
         </div>
 
-        <!-- Konten Detail Obat (Disembunyikan sampai ada yang dipilih) -->
+        <!-- Konten Detail Obat -->
         <div id="detailContainer" class="hidden animate-fade-in space-y-4">
             
             <!-- Kartu Header Obat -->
@@ -100,13 +155,11 @@
                         </div>
                     </div>
                 </div>
-                <!-- Ornamen Background -->
                 <div class="absolute -bottom-10 -right-10 text-9xl opacity-10">💊</div>
             </div>
 
             <!-- Grid Informasi -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Kolom Kiri -->
                 <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-5">
                     <div class="flex items-start gap-4">
                         <span class="text-3xl bg-gray-50 p-2 rounded-lg">📦</span>
@@ -131,7 +184,6 @@
                     </div>
                 </div>
 
-                <!-- Kolom Kanan -->
                 <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-5">
                     <div class="flex items-start gap-4">
                         <span class="text-3xl bg-gray-50 p-2 rounded-lg">💳</span>
@@ -157,7 +209,7 @@
                 </div>
             </div>
 
-            <!-- Restriksi Penggunaan (Kotak Orange) -->
+            <!-- Restriksi Penggunaan -->
             <div class="bg-orange-50 rounded-2xl border border-orange-200 shadow-sm p-6 md:p-8">
                 <h2 class="text-lg font-bold text-orange-800 mb-3 flex items-center gap-2">
                     <span>⚠️</span> Catatan Penting & Restriksi
@@ -181,6 +233,7 @@
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) { window.location.href = 'index.html'; return; }
 
+            // Ambil semua data obat
             const { data, error } = await supabaseClient
                 .from('master_obat')
                 .select('*')
@@ -193,6 +246,10 @@
 
             allObatData = data;
 
+            // 1. HITUNG STATISTIK
+            hitungStatistik(data);
+
+            // 2. ISI DROPDOWN PENCARIAN
             const selectEl = document.getElementById('pencarianObat');
             selectEl.innerHTML = '<option value="">Ketik nama obat...</option>' + data.map(obat => {
                 let label = obat.nama_generik;
@@ -201,6 +258,7 @@
                 return `<option value="${obat.id}">${label}</option>`;
             }).join('');
 
+            // 3. INISIALISASI TOM SELECT
             new TomSelect("#pencarianObat", {
                 create: false,
                 sortField: { field: "text", direction: "asc" },
@@ -215,6 +273,37 @@
                     }
                 }
             });
+        }
+
+        function hitungStatistik(data) {
+            // Hitung total dasar
+            const total = data.length;
+            const aktif = data.filter(d => d.is_active).length;
+            const nonAktif = data.filter(d => !d.is_active).length;
+            const kronis = data.filter(d => d.is_kronis).length;
+            
+            // Hitung Jaminan
+            const fornas = data.filter(d => d.status_jaminan === 'Fornas').length;
+            const nonFornas = data.filter(d => d.status_jaminan === 'Non-Fornas').length;
+
+            // Hitung jumlah unik untuk Sediaan dan Kelompok
+            // Menggunakan Set untuk mendapatkan nilai yang unik (tidak duplikat)
+            const uniqueSediaan = new Set(data.map(d => d.bentuk_sediaan?.toLowerCase().trim()).filter(Boolean));
+            const uniqueKelompok = new Set(data.map(d => d.kelompok_obat?.toLowerCase().trim()).filter(Boolean));
+
+            // Tampilkan ke HTML
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statAktif').textContent = aktif;
+            document.getElementById('statNonAktif').textContent = nonAktif;
+            document.getElementById('statKronis').textContent = kronis;
+            document.getElementById('statFornas').textContent = fornas;
+            document.getElementById('statNonFornas').textContent = nonFornas;
+            document.getElementById('statSediaan').textContent = uniqueSediaan.size + ' Jenis';
+            document.getElementById('statKelompok').textContent = uniqueKelompok.size + ' Jenis';
+
+            // Tampilkan panel, sembunyikan skeleton
+            document.getElementById('statistikPanel').innerHTML = document.getElementById('statistikData').outerHTML.replace('hidden', '');
+            document.getElementById('statistikData').classList.remove('hidden');
         }
 
         function renderDetail(id) {
