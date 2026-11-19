@@ -29,7 +29,7 @@
 
     <!-- Header -->
     <header class="bg-white shadow-sm border-b sticky top-0 z-20 flex-shrink-0">
-        <div class="w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 py-3 flex justify-between items-center">
+    <div class="w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 py-2 flex justify-between items-center">
             <div class="h-10 w-32 bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs font-semibold">RSUD AMP</div>
             <div class="flex items-center gap-2 md:gap-3">
                 <a href="panduan.html" class="bg-rsud text-white px-3 md:px-4 py-2 rounded-full text-xs md:text-sm font-medium hover:bg-emerald-700 transition">Cara Penggunaan</a>
@@ -50,7 +50,7 @@
 
             <!-- Stat Cards -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4">
-                <button data-tab="tugas-saya" class="stat-card bg-rsud text-white rounded-xl p-3 md:p-4 text-left active">
+                <button data-tab="tugas-saya" class="stat-card bg-rsud text-white rounded-lg p-2 md:p-3 text-left active">
                     <div class="flex items-center justify-between mb-1">
                         <span class="text-xl md:text-2xl">📌</span>
                         <span class="text-[10px] md:text-xs font-medium bg-white/20 px-2 py-1 rounded-full">Fokus</span>
@@ -75,32 +75,29 @@
                 </button>
             </div>
 
-            <!-- Filter Box -->
-            <div class="bg-rsud rounded-xl p-3 md:p-5 mb-4 shadow-md">
-                <h2 class="text-lg md:text-xl font-bold text-white mb-3">Daftar Pengajuan Obat</h2>
-                <div class="mb-3">
-                    <input type="text" id="searchObat" placeholder="🔍 Cari Nama Obat..." class="w-full px-4 py-2 rounded-lg border-none focus:ring-2 focus:ring-emerald-300 outline-none text-sm">
+            <!-- Filter Box Ramping (1 Baris Penuh) -->
+            <div class="bg-rsud rounded-lg p-3 mb-3 shadow-sm">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-2">
+                    <h2 class="text-sm md:text-base font-bold text-white">Daftar Pengajuan Obat</h2>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <button id="resetFilter" class="text-white text-[11px] hover:underline px-2">Reset</button>
+                        <button id="searchBtn" class="bg-white text-rsud px-4 py-1 rounded text-xs font-bold hover:bg-gray-100 transition w-full md:w-auto">Search</button>
+                    </div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
-                    <div>
-                        <label class="block text-xs text-white mb-1">Dari Tanggal</label>
-                        <input type="date" id="dariTanggal" class="w-full px-3 py-1.5 rounded-lg border-none text-sm outline-none">
+                
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-2">
+                    <div class="lg:col-span-2">
+                        <input type="text" id="searchObat" placeholder="🔍 Cari Nama Obat..." class="w-full px-3 py-1.5 rounded border-none focus:ring-2 focus:ring-emerald-300 outline-none text-xs h-full">
                     </div>
-                    <div>
-                        <label class="block text-xs text-white mb-1">Sampai Tanggal</label>
-                        <input type="date" id="sampaiTanggal" class="w-full px-3 py-1.5 rounded-lg border-none text-sm outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-white mb-1">Tipe Pengajuan</label>
-                        <select id="tipePengajuan" class="w-full px-3 py-1.5 rounded-lg border-none bg-white text-sm outline-none">
-                            <option value="">Semua</option>
+                    <div class="lg:col-span-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <input type="date" id="dariTanggal" class="w-full px-2 py-1.5 rounded border-none text-[11px] outline-none text-gray-600" title="Dari Tanggal">
+                        <input type="date" id="sampaiTanggal" class="w-full px-2 py-1.5 rounded border-none text-[11px] outline-none text-gray-600" title="Sampai Tanggal">
+                        <select id="tipePengajuan" class="w-full px-2 py-1.5 rounded border-none bg-white text-[11px] outline-none text-gray-600">
+                            <option value="">Semua Tipe</option>
                             <option value="reguler">Reguler</option>
                         </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-white mb-1">Ketua KSM</label>
-                        <select id="filterKsm" class="w-full px-3 py-1.5 rounded-lg border-none bg-white text-sm outline-none">
-                            <option value="">Semua</option>
+                        <select id="filterKsm" class="w-full px-2 py-1.5 rounded border-none bg-white text-[11px] outline-none text-gray-600">
+                            <option value="">Semua KSM</option>
                             <option value="Anak-Jtg-Saraf-Gilut">Anak-Jtg-Saraf-Gilut</option>
                             <option value="Jantung">Jantung</option>
                             <option value="Syaraf dan Jiwa">Syaraf dan Jiwa</option>
@@ -113,52 +110,46 @@
                         </select>
                     </div>
                 </div>
-                <div class="flex justify-end gap-3 mt-2">
-                    <button id="resetFilter" class="text-white text-xs hover:underline">Reset Filter</button>
-                    <button id="searchBtn" class="bg-white text-rsud px-5 py-1.5 rounded-lg text-sm font-semibold hover:bg-gray-100 transition">Search</button>
-                </div>
             </div>
 
-            <!-- Tombol Aksi -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-2">
-                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <button id="ajukanBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition flex justify-center items-center gap-2">
-                        <span>+</span> Ajukan Obat Baru
+            <!-- Tombol Aksi Ramping -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
+                <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <button id="ajukanBtn" class="bg-white border border-gray-300 text-gray-700 px-3 py-1.5 rounded text-[11px] font-medium hover:bg-gray-50 transition flex justify-center items-center gap-1.5 shadow-sm">
+                        <span>+</span> Ajukan Obat
                     </button>
-                    <!-- TOMBOL MASTER OBAT -->
-                    <button id="masterObatBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-rsud px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-50 transition flex justify-center items-center gap-2 shadow-sm">
+                    <button id="masterObatBtn" class="bg-white border border-gray-300 text-rsud px-3 py-1.5 rounded text-[11px] font-medium hover:bg-emerald-50 transition flex justify-center items-center gap-1.5 shadow-sm">
                         <span>⚙️</span> Master Obat
                     </button>
-                    <!-- TOMBOL FORMULARIUM OBAT -->
-                    <button id="kamusObatBtn" class="w-full sm:w-auto bg-emerald-50 border border-emerald-300 text-emerald-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-100 transition flex justify-center items-center gap-2 shadow-sm">
-                        <span>📚</span> Formularium Obat
+                    <button id="kamusObatBtn" class="bg-emerald-50 border border-emerald-300 text-emerald-700 px-3 py-1.5 rounded text-[11px] font-medium hover:bg-emerald-100 transition flex justify-center items-center gap-1.5 shadow-sm">
+                        <span>📚</span> Formularium
                     </button>
                 </div>
-                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <button id="printBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition flex justify-center items-center gap-2">
+                <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <button id="printBtn" class="bg-white border border-gray-300 text-gray-700 px-3 py-1.5 rounded text-[11px] font-medium hover:bg-gray-50 transition flex justify-center items-center gap-1.5 shadow-sm">
                         <span>🖨️</span> Cetak PDF
                     </button>
-                    <button id="exportBtn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition flex justify-center items-center gap-2">
-                        <span>⬇</span> Download Excel
+                    <button id="exportBtn" class="bg-white border border-gray-300 text-gray-700 px-3 py-1.5 rounded text-[11px] font-medium hover:bg-gray-50 transition flex justify-center items-center gap-1.5 shadow-sm">
+                        <span>⬇</span> Excel
                     </button>
                 </div>
             </div>
 
-            <div id="infoJumlah" class="text-xs text-gray-500 mb-2"></div>
+            <div id="infoJumlah" class="text-[11px] text-gray-500 mb-1 px-1"></div>
         </div>
 
-        <!-- Area Tabel (Bisa di-scroll vertikal di Desktop, dan horizontal di HP) -->
+        <!-- Area Tabel (Maksimal) -->
         <div id="tableScroll" class="w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 pb-2 md:flex-1 md:overflow-y-auto">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto h-full">
                 <table class="w-full text-left border-collapse min-w-[700px]">
-                    <thead class="sticky top-0 z-10 bg-gray-50 shadow-sm">
-                        <tr class="text-gray-600 text-xs uppercase tracking-wider whitespace-nowrap">
-                            <th class="p-3 font-semibold">No</th>
-                            <th class="p-3 font-semibold">Tanggal</th>
-                            <th class="p-3 font-semibold">Nama Obat</th>
-                            <th class="p-3 font-semibold">KSM</th>
-                            <th class="p-3 font-semibold">Status</th>
-                            <th class="p-3 font-semibold">Aksi</th>
+                    <thead class="sticky top-0 z-10 bg-gray-100 shadow-sm">
+                        <tr class="text-gray-600 text-[11px] uppercase tracking-wider whitespace-nowrap">
+                            <th class="px-3 py-2 font-semibold">No</th>
+                            <th class="px-3 py-2 font-semibold">Tanggal</th>
+                            <th class="px-3 py-2 font-semibold">Nama Obat</th>
+                            <th class="px-3 py-2 font-semibold">KSM</th>
+                            <th class="px-3 py-2 font-semibold">Status</th>
+                            <th class="px-3 py-2 font-semibold">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="text-gray-700 text-sm divide-y divide-gray-100"></tbody>
@@ -167,51 +158,51 @@
         </div>
 
         <!-- Pagination -->
-        <div class="w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 pb-4 flex-shrink-0">
-            <div id="pagination" class="mt-3"></div>
+        <div class="w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 pb-3 flex-shrink-0">
+            <div id="pagination" class="mt-2"></div>
         </div>
 
     </main>
 
     <!-- Modal Print -->
     <div id="printModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
-            <div class="p-5 border-b flex justify-between items-center flex-shrink-0">
-                <h3 class="text-lg font-bold text-gray-800">🖨️ Pilih Jenis Cetakan</h3>
+        <div class="bg-white rounded-xl shadow-xl max-w-xl w-full max-h-[90vh] flex flex-col">
+            <div class="p-4 border-b flex justify-between items-center flex-shrink-0">
+                <h3 class="text-base font-bold text-gray-800">🖨️ Pilih Jenis Cetakan</h3>
                 <button onclick="closePrintModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
             </div>
-            <div class="p-5 overflow-y-auto flex-1">
-                <div class="space-y-3">
-                    <label class="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-emerald-400 transition" id="radioDaftarLabel">
-                        <input type="radio" name="printMode" value="daftar" checked class="mt-1 w-4 h-4" onchange="onPrintModeChange()">
+            <div class="p-4 overflow-y-auto flex-1">
+                <div class="space-y-2">
+                    <label class="flex items-start gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-emerald-400 transition" id="radioDaftarLabel">
+                        <input type="radio" name="printMode" value="daftar" checked class="mt-0.5 w-4 h-4" onchange="onPrintModeChange()">
                         <div class="flex-1">
-                            <div class="font-semibold text-gray-800">📋 Cetak Daftar Pengajuan</div>
-                            <div class="text-sm text-gray-500 mt-1">Cetak tabel daftar semua pengajuan yang sedang tampil (<span id="modalCountDaftar" class="font-semibold text-emerald-600">0</span> data)</div>
+                            <div class="font-semibold text-sm text-gray-800">📋 Cetak Daftar Pengajuan</div>
+                            <div class="text-[11px] text-gray-500 mt-0.5">Cetak tabel daftar pengajuan yang tampil (<span id="modalCountDaftar" class="font-semibold text-emerald-600">0</span> data)</div>
                         </div>
                     </label>
-                    <label class="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-emerald-400 transition" id="radioFormLabel">
-                        <input type="radio" name="printMode" value="form" class="mt-1 w-4 h-4" onchange="onPrintModeChange()">
+                    <label class="flex items-start gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-emerald-400 transition" id="radioFormLabel">
+                        <input type="radio" name="printMode" value="form" class="mt-0.5 w-4 h-4" onchange="onPrintModeChange()">
                         <div class="flex-1">
-                            <div class="font-semibold text-gray-800">📄 Cetak Form Pengajuan</div>
-                            <div class="text-sm text-gray-500 mt-1">Pilih pengajuan yang ingin dicetak formulir lengkapnya</div>
+                            <div class="font-semibold text-sm text-gray-800">📄 Cetak Form Pengajuan</div>
+                            <div class="text-[11px] text-gray-500 mt-0.5">Pilih pengajuan yang ingin dicetak formulir lengkapnya</div>
                         </div>
                     </label>
                 </div>
-                <div id="modalFormList" class="hidden mt-4 border-t pt-4">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-sm font-medium text-gray-700">Pilih Pengajuan:</span>
-                        <div class="flex gap-3">
-                            <button onclick="selectAllForm(true)" class="text-xs text-emerald-600 hover:underline font-medium">Pilih Semua</button>
-                            <button onclick="selectAllForm(false)" class="text-xs text-gray-500 hover:underline font-medium">Kosongkan</button>
+                <div id="modalFormList" class="hidden mt-3 border-t pt-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-medium text-gray-700">Pilih Pengajuan:</span>
+                        <div class="flex gap-2">
+                            <button onclick="selectAllForm(true)" class="text-[11px] text-emerald-600 hover:underline font-medium">Pilih Semua</button>
+                            <button onclick="selectAllForm(false)" class="text-[11px] text-gray-500 hover:underline font-medium">Kosongkan</button>
                         </div>
                     </div>
-                    <div id="modalCheckboxList" class="space-y-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50"></div>
-                    <div class="mt-2 text-xs text-gray-500"><span id="modalCountSelected">0</span> pengajuan dipilih</div>
+                    <div id="modalCheckboxList" class="space-y-1 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50"></div>
+                    <div class="mt-1 text-[11px] text-gray-500"><span id="modalCountSelected">0</span> pengajuan dipilih</div>
                 </div>
             </div>
-            <div class="p-4 border-t flex justify-end gap-2 flex-shrink-0 bg-gray-50 rounded-b-2xl">
-                <button onclick="closePrintModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-white transition font-medium">Batal</button>
-                <button onclick="doPrint()" class="px-6 py-2 bg-rsud text-white rounded-lg font-semibold hover:bg-emerald-700 transition">🖨️ Cetak Sekarang</button>
+            <div class="p-3 border-t flex justify-end gap-2 flex-shrink-0 bg-gray-50 rounded-b-xl">
+                <button onclick="closePrintModal()" class="px-3 py-1.5 border border-gray-300 rounded text-xs text-gray-700 hover:bg-white transition font-medium">Batal</button>
+                <button onclick="doPrint()" class="px-4 py-1.5 bg-rsud text-white rounded text-xs font-semibold hover:bg-emerald-700 transition">🖨️ Cetak Sekarang</button>
             </div>
         </div>
     </div>
