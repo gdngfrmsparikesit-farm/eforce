@@ -264,6 +264,10 @@
                 let label = obat.nama_generik;
                 if (obat.nama_dagang) label += ` (${obat.nama_dagang})`;
                 label += ` - ${obat.bentuk_sediaan} ${obat.kekuatan_dosis || ''}`;
+                // TAMBAHKAN LABEL FORNAS
+                if (obat.is_fornas) {
+                    label += ` [Fornas]`;
+                }
                 return `<option value="${obat.id}" data-nama="${obat.nama_generik}" data-dagang="${obat.nama_dagang || ''}">${label}</option>`;
             }).join('');
 
