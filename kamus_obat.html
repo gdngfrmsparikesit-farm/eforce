@@ -52,7 +52,7 @@
 
     <!-- Header -->
     <header class="bg-white shadow-sm border-b sticky top-0 z-20">
-        <div class="w-full max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="w-full max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <div class="h-8 w-24 bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs font-semibold">RSUD AMP</div>
                 <span class="font-bold text-gray-700 hidden sm:block">Formularium RSUD AM Parikesit</span>
@@ -72,23 +72,23 @@
             <p class="text-gray-500 max-w-2xl mx-auto">Pusat informasi obat. Ketik nama generik atau nama dagang untuk melihat rincian, restriksi, dan status jaminan secara instan.</p>
         </div>
 
-        <!-- PANEL STATISTIK (FITUR BARU) -->
+        <!-- PANEL STATISTIK -->
         <div id="statistikPanel" class="mb-8">
-            <!-- Skeleton Loading untuk Statistik -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 animate-pulse">
+            <!-- Skeleton Loading -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 animate-pulse">
                 <div class="bg-gray-200 h-24 rounded-xl"></div>
                 <div class="bg-gray-200 h-24 rounded-xl"></div>
                 <div class="bg-gray-200 h-24 rounded-xl"></div>
                 <div class="bg-gray-200 h-24 rounded-xl"></div>
-                <div class="bg-gray-200 h-24 rounded-xl hidden md:block"></div>
-                <div class="bg-gray-200 h-24 rounded-xl hidden md:block"></div>
-                <div class="bg-gray-200 h-24 rounded-xl hidden md:block"></div>
-                <div class="bg-gray-200 h-24 rounded-xl hidden md:block"></div>
+                <div class="bg-gray-200 h-24 rounded-xl"></div>
+                <div class="bg-gray-200 h-24 rounded-xl hidden lg:block"></div>
+                <div class="bg-gray-200 h-24 rounded-xl hidden lg:block"></div>
+                <div class="bg-gray-200 h-24 rounded-xl hidden lg:block"></div>
+                <div class="bg-gray-200 h-24 rounded-xl hidden lg:block"></div>
             </div>
             
-            <!-- Kontainer Data Asli (Disembunyikan dulu) -->
-            <div id="statistikData" class="hidden grid grid-cols-2 md:grid-cols-4 gap-3">
-                <!-- Total & Status Aktif -->
+            <!-- Kontainer Data Asli -->
+            <div id="statistikData" class="hidden grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                 <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm flex flex-col justify-center">
                     <div class="text-xs text-gray-500 font-semibold mb-1 flex items-center gap-1"><span>💊</span> Total Item</div>
                     <div class="text-2xl font-bold text-gray-800" id="statTotal">-</div>
@@ -105,8 +105,11 @@
                     <div class="text-xs text-gray-500 font-semibold mb-1 flex items-center gap-1"><span>🏥</span> Kelompok</div>
                     <div class="text-2xl font-bold text-gray-800" id="statKelompok">-</div>
                 </div>
+                <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm flex flex-col justify-center">
+                    <div class="text-xs text-gray-500 font-semibold mb-1 flex items-center gap-1"><span>📦</span> Sediaan</div>
+                    <div class="text-2xl font-bold text-gray-800" id="statSediaan">-</div>
+                </div>
 
-                <!-- Jaminan & Kronis -->
                 <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 shadow-sm flex flex-col justify-center">
                     <div class="text-xs text-blue-700 font-semibold mb-1 flex items-center gap-1"><span>💳</span> Fornas (BPJS)</div>
                     <div class="text-2xl font-bold text-blue-700" id="statFornas">-</div>
@@ -119,9 +122,9 @@
                     <div class="text-xs text-orange-700 font-semibold mb-1 flex items-center gap-1"><span>❤️</span> Obat Kronis</div>
                     <div class="text-2xl font-bold text-orange-700" id="statKronis">-</div>
                 </div>
-                <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm flex flex-col justify-center">
-                    <div class="text-xs text-gray-500 font-semibold mb-1 flex items-center gap-1"><span>📦</span> Sediaan</div>
-                    <div class="text-2xl font-bold text-gray-800" id="statSediaan">-</div>
+                <div class="bg-blue-100 border-2 border-blue-400 rounded-xl p-3 shadow-md flex flex-col justify-center col-span-2 md:col-span-1">
+                    <div class="text-xs text-blue-800 font-bold mb-1 flex items-center gap-1"><span>📊</span> Kepatuhan Fornas</div>
+                    <div class="text-2xl font-extrabold text-blue-800" id="statPersenFornas">-</div>
                 </div>
             </div>
         </div>
@@ -147,7 +150,7 @@
                     <div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-4">
                         <div>
                             <span id="badgeKategori" class="text-xs font-bold bg-white/20 px-3 py-1 rounded-full mb-2 inline-block">-</span>
-                            <h1 id="namaGenerik" class="text-3xl md:text-4xl font-bold leading-tight">-</h1>
+                            <h1 id="namaGenerik" class="text-2xl md:text-4xl font-bold leading-tight flex flex-wrap items-center gap-2">-</h1>
                             <p id="namaDagang" class="text-emerald-100 text-lg mt-1 font-medium">-</p>
                         </div>
                         <div id="statusBadge" class="text-sm font-bold bg-white text-rsud px-4 py-2 rounded-xl shadow-sm">
@@ -255,6 +258,10 @@
                 let label = obat.nama_generik;
                 if (obat.nama_dagang) label += ` (${obat.nama_dagang})`;
                 label += ` - ${obat.bentuk_sediaan} ${obat.kekuatan_dosis || ''}`;
+                
+                // Tambahkan label Fornas di dropdown
+                if (obat.is_fornas) label += ` [Fornas]`;
+
                 return `<option value="${obat.id}">${label}</option>`;
             }).join('');
 
@@ -276,20 +283,22 @@
         }
 
         function hitungStatistik(data) {
-            // Hitung total dasar
             const total = data.length;
             const aktif = data.filter(d => d.is_active).length;
             const nonAktif = data.filter(d => !d.is_active).length;
             const kronis = data.filter(d => d.is_kronis).length;
             
-            // Hitung Jaminan
-            const fornas = data.filter(d => d.status_jaminan === 'Fornas').length;
-            const nonFornas = data.filter(d => d.status_jaminan === 'Non-Fornas').length;
+            // Hitung Jaminan (Menggunakan is_fornas sebagai patokan validasi Fornas)
+            const fornas = data.filter(d => d.is_fornas).length;
+            const nonFornas = total - fornas;
 
             // Hitung jumlah unik untuk Sediaan dan Kelompok
-            // Menggunakan Set untuk mendapatkan nilai yang unik (tidak duplikat)
             const uniqueSediaan = new Set(data.map(d => d.bentuk_sediaan?.toLowerCase().trim()).filter(Boolean));
             const uniqueKelompok = new Set(data.map(d => d.kelompok_obat?.toLowerCase().trim()).filter(Boolean));
+
+            // Hitung Kepatuhan (Persentase RS yang masuk standar Fornas)
+            const fornasMasukRS = data.filter(d => d.is_fornas && d.is_rs_adopted).length;
+            const persenKepatuhan = fornas > 0 ? ((fornasMasukRS / fornas) * 100).toFixed(1) : 0;
 
             // Tampilkan ke HTML
             document.getElementById('statTotal').textContent = total;
@@ -300,6 +309,7 @@
             document.getElementById('statNonFornas').textContent = nonFornas;
             document.getElementById('statSediaan').textContent = uniqueSediaan.size + ' Jenis';
             document.getElementById('statKelompok').textContent = uniqueKelompok.size + ' Jenis';
+            document.getElementById('statPersenFornas').textContent = persenKepatuhan + '%';
 
             // Tampilkan panel, sembunyikan skeleton
             document.getElementById('statistikPanel').innerHTML = document.getElementById('statistikData').outerHTML.replace('hidden', '');
@@ -314,7 +324,12 @@
             const detailContainer = document.getElementById('detailContainer');
             detailContainer.classList.remove('hidden');
 
-            document.getElementById('namaGenerik').textContent = obat.nama_generik;
+            // Tampilkan Badge Fornas
+            const badgeFornas = obat.is_fornas 
+                ? `<span class="text-xs font-bold bg-blue-500 text-white px-3 py-1 rounded-full">FORNAS</span>` 
+                : `<span class="text-xs font-bold bg-gray-400 text-white px-3 py-1 rounded-full">NON-FORNAS</span>`;
+            
+            document.getElementById('namaGenerik').innerHTML = obat.nama_generik + badgeFornas;
             document.getElementById('namaDagang').textContent = obat.nama_dagang ? `Nama Dagang: ${obat.nama_dagang}` : '';
             document.getElementById('badgeKategori').textContent = obat.kode_kategori || 'Umum';
             
