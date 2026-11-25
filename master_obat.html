@@ -279,31 +279,29 @@
                     <tr class="hover:bg-gray-50 transition border-l-4 ${(item.is_fornas && !item.is_rs_adopted) ? 'border-l-blue-400' : 'border-l-transparent'}">
                         <td class="p-3 font-mono text-xs text-gray-500 whitespace-nowrap">${item.kode_obat || '-'}</td>
                         
-                        <!-- Kolom Nama -->
-                        <td class="p-3 min-w-[200px]">
-                            <div class="font-bold text-gray-800">${item.nama_generik}</div>
-                            <div class="text-xs text-gray-500">${item.nama_dagang || ''}</div>
+                        <!-- Kolom Nama: Batasi 2 baris -->
+                        <td class="p-3 min-w-[200px] max-w-[350px]">
+                            <div class="font-bold text-gray-800 line-clamp-2" title="${item.nama_generik}">${item.nama_generik}</div>
+                            <div class="text-xs text-gray-500 truncate" title="${item.nama_dagang || ''}">${item.nama_dagang || ''}</div>
                         </td>
                         
-                        <!-- Kolom Kelompok -->
-                        <td class="p-3 text-xs leading-snug">
+                        <!-- Kolom Kelompok: Batasi 2 baris -->
+                        <td class="p-3 text-xs leading-snug min-w-[150px]">
                             <div class="max-w-[200px] line-clamp-2" title="${item.kelompok_obat}">${item.kelompok_obat}</div>
                         </td>
                         
-                        <!-- Kolom Sediaan -->
+                        <!-- Kolom Sediaan: Jangan turun baris -->
                         <td class="p-3 whitespace-nowrap">
                             ${item.bentuk_sediaan} <span class="text-gray-500 text-xs">${item.kekuatan_dosis ? `(${item.kekuatan_dosis})` : ''}</span>
                         </td>
                         
-                        <!-- Kolom Jaminan -->
                         <td class="p-3">${badgeJaminan}</td>
                         
-                        <!-- Kolom Status -->
                         <td class="p-3">${badgeStatus}</td>
                         
-                        <!-- Kolom Aksi (Struktur Diperbaiki) -->
-                        <td class="p-3">
-                            <div class="flex flex-wrap gap-2 items-center">
+                        <!-- Kolom Aksi: Paksa tetap menyamping (flex-nowrap) -->
+                        <td class="p-3 whitespace-nowrap">
+                            <div class="flex flex-nowrap gap-2 items-center">
                                 ${(item.is_fornas && !item.is_rs_adopted && item.is_active) 
                                     ? `<button onclick="adopsiKeRS('${item.id}')" class="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm flex items-center gap-1 whitespace-nowrap"><span>➕</span> Adopsi</button>`
                                     : ''
